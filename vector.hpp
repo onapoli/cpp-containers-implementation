@@ -3,6 +3,8 @@
 
 # include <iostream>
 # include <memory>
+# include <cstddef>
+# include "vector_iter.hpp"
 
 namespace	ft
 {
@@ -16,15 +18,19 @@ namespace	ft
 	public:
 
 		// Member Types
-		typedef T			value_type;
-		typedef	T*			pointer;
-		typedef T&			reference;
-		typedef	T const*	const_pointer;
-		typedef T const&	const_reference;
-		typedef Alloc		allocator_type;
-		typedef std::size_t	size_type;
+		typedef T						value_type;
+		typedef	T*						pointer;
+		typedef T&						reference;
+		typedef	T const*				const_pointer;
+		typedef T const&				const_reference;
+		typedef Alloc					allocator_type;
+		typedef std::size_t				size_type;
+		typedef	ptrdiff_t				difference_type;
+		typedef vector_iter<T, Alloc>	iterator;
 
 		// Member Functions
+
+		//constructors and destructor
 		vector< T, Alloc >(allocator_type const & alloc = allocator_type());
 		vector< T, Alloc >(size_type n, value_type const & val = value_type(),
 			allocator_type const & alloc = allocator_type());
@@ -32,10 +38,14 @@ namespace	ft
 		vector< T, Alloc >(vector< T, Alloc > const & src);
 		~vector< T, Alloc >(void);
 
+		//assignment operator overload
+		vector< T, Alloc > &	operator=(vector< T, Alloc > const & rhs);
+
 		//iterators
+		iterator				begin(void);
+		iterator				end(void);
 
 		// capacity
-		vector< T, Alloc > &	operator=(vector< T, Alloc > const & rhs);
 		size_type				size(void) const;
 		size_type				capacity(void) const;
 		bool					empty(void) const;
@@ -141,6 +151,23 @@ namespace	ft
 		return (*this);
 	}
 
+	// iterator Functions
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::iterator	vector< T, Alloc >::begin(void)
+	{
+		typename vector< T, Alloc >::iterator	it(*this, 0);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::iterator	vector< T, Alloc >::end(void)
+	{
+		typename vector< T, Alloc >::iterator	it(*this, this->_size);
+
+		return (it);
+	}
+
 	// capacity Functions
 
 	template< typename T, typename Alloc >
@@ -236,7 +263,7 @@ namespace	ft
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::reference	vector< T, Alloc >::front(void)
 	{
-		std::cout << "front called ";
+		//std::cout << "front called ";
 		return (*this->_content);
 	}
 
@@ -244,14 +271,14 @@ namespace	ft
 	typename vector< T, Alloc >::const_reference
 		vector< T, Alloc >::front(void) const
 	{
-		std::cout << "const front called ";
+		//std::cout << "const front called ";
 		return (*this->_content);
 	}
 
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::reference	vector< T, Alloc >::back(void)
 	{
-		std::cout << "back called ";
+		//std::cout << "back called ";
 		return (this->_content[this->_size - 1]);
 	}
 
@@ -259,7 +286,7 @@ namespace	ft
 	typename vector< T, Alloc >::const_reference
 		vector< T, Alloc >::back(void) const
 	{
-		std::cout << "const back called ";
+		//std::cout << "const back called ";
 		return (this->_content[this->_size - 1]);
 	}
 
@@ -267,7 +294,7 @@ namespace	ft
 	typename vector< T, Alloc >::reference
 		vector< T, Alloc >::at(size_type n)
 	{
-		std::cout << "at called ";
+		//std::cout << "at called ";
 		if (n >= this->_size)
 			throw std::out_of_range("Bad index");
 		return (this->_content[n]);
@@ -277,7 +304,7 @@ namespace	ft
 	typename vector< T, Alloc >::const_reference
 		vector< T, Alloc >::at(size_type n) const
 	{
-		std::cout << "const at called ";
+		//std::cout << "const at called ";
 		if (n >= this->_size)
 			throw std::out_of_range("Bad index");
 		return (this->_content[n]);
@@ -287,7 +314,7 @@ namespace	ft
 	typename vector< T, Alloc >::reference
 		vector< T, Alloc >::operator[](size_type n)
 	{
-		std::cout << "operator[] called ";
+		//std::cout << "operator[] called ";
 		return (this->_content[n]);
 	}
 
@@ -295,7 +322,7 @@ namespace	ft
 	typename vector< T, Alloc >::const_reference
 		vector< T, Alloc >::operator[](size_type n) const
 	{
-		std::cout << "const operator[] called ";
+		//std::cout << "const operator[] called ";
 		return (this->_content[n]);
 	}
 
