@@ -26,7 +26,8 @@ namespace	ft
 		typedef Alloc					allocator_type;
 		typedef std::size_t				size_type;
 		typedef	ptrdiff_t				difference_type;
-		typedef vector_iter<T, Alloc>	iterator;
+		typedef vector_iter<T>			iterator;
+		typedef vector_iter<const T>	const_iterator;
 
 		// Member Functions
 
@@ -43,7 +44,9 @@ namespace	ft
 
 		//iterators
 		iterator				begin(void);
+		const_iterator			begin(void) const;
 		iterator				end(void);
+		const_iterator			end(void) const;
 
 		// capacity
 		size_type				size(void) const;
@@ -152,10 +155,19 @@ namespace	ft
 	}
 
 	// iterator Functions
+
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::iterator	vector< T, Alloc >::begin(void)
 	{
-		typename vector< T, Alloc >::iterator	it(*this, 0);
+		typename vector< T, Alloc >::iterator	it(this->_content);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::const_iterator	vector< T, Alloc >::begin(void) const
+	{
+		typename vector< T, Alloc >::const_iterator	it(this->_content);
 
 		return (it);
 	}
@@ -163,7 +175,15 @@ namespace	ft
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::iterator	vector< T, Alloc >::end(void)
 	{
-		typename vector< T, Alloc >::iterator	it(*this, this->_size);
+		typename vector< T, Alloc >::iterator	it(this->_content + this->_size);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::const_iterator	vector< T, Alloc >::end(void) const
+	{
+		typename vector< T, Alloc >::const_iterator	it(this->_content + this->_size);
 
 		return (it);
 	}
