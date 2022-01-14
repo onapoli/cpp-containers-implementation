@@ -5,6 +5,7 @@
 # include <memory>
 # include <cstddef>
 # include "vector_iter.hpp"
+# include "reverse_iterator.hpp"
 
 namespace	ft
 {
@@ -18,24 +19,31 @@ namespace	ft
 	public:
 
 		// Member Types
-		typedef T						value_type;
-		typedef	T*						pointer;
-		typedef T&						reference;
-		typedef	T const*				const_pointer;
-		typedef T const&				const_reference;
-		typedef Alloc					allocator_type;
-		typedef std::size_t				size_type;
-		typedef	ptrdiff_t				difference_type;
-		typedef vector_iter<T>			iterator;
-		typedef vector_iter<const T>	const_iterator;
+		typedef T										value_type;
+		typedef	T*										pointer;
+		typedef T&										reference;
+		typedef	T const*								const_pointer;
+		typedef T const&								const_reference;
+		typedef Alloc									allocator_type;
+		typedef std::size_t								size_type;
+		typedef	ptrdiff_t								difference_type;
+		typedef vector_iter<T>							iterator;
+		typedef vector_iter<const T>					const_iterator;
+		typedef ft::reverse_iterator<iterator>			reverse_iterator;
+		typedef ft::reverse_iterator<const iterator>	const_reverse_iterator;
 
 		// Member Functions
 
 		//constructors and destructor
-		vector< T, Alloc >(allocator_type const & alloc = allocator_type());
-		vector< T, Alloc >(size_type n, value_type const & val = value_type(),
+		explicit vector< T, Alloc >(allocator_type const & alloc =
+			allocator_type());
+		explicit vector< T, Alloc >(size_type n,
+			value_type const & val = value_type(),
 			allocator_type const & alloc = allocator_type());
-		// range Constructor missing for now ...
+		//range constructor function template
+		/*template< typename InputIterator >
+		vector< T, Alloc >(InputIterator first, InputIterator last,
+			allocator_type const & alloc = allocator_type());*/
 		vector< T, Alloc >(vector< T, Alloc > const & src);
 		~vector< T, Alloc >(void);
 
@@ -114,6 +122,15 @@ namespace	ft
 		this->_allocate_content(this->_capacity, val);
 		return ;
 	}
+
+	/*template< typename T, typename Alloc >
+	template< typename InputIterator >
+	vector<T, Alloc>::vector(InputIterator first, InputIterator last,
+		allocator_type const & alloc) : _alloc(alloc), _content(0), _size(last - first), _capacity(_size)
+	{
+		std::cout << "iter difference: " << last - first << std::endl;
+		return ;
+	}*/
 
 	template< typename T, typename Alloc >
 	vector< T, Alloc >::vector(vector< T, Alloc > const & src)
