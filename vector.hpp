@@ -6,6 +6,8 @@
 # include <cstddef>
 # include "vector_iter.hpp"
 # include "reverse_iterator.hpp"
+# include "enable_if.hpp"
+# include "is_integral.hpp"
 
 namespace	ft
 {
@@ -41,9 +43,38 @@ namespace	ft
 			value_type const & val = value_type(),
 			allocator_type const & alloc = allocator_type());
 		//range constructor function template
-		/*template< typename InputIterator >
+		/*
+		**	HOW enable_if WORKS:
+		**
+		**	IF is_inegral<InputIterator>::value == true THERE WILL BE
+		**	NO enable_if<>::type, AND THANKS TO 'SFINAE', THE TYPE
+		**	SUBSTITUTION FOR THIS TEMPLATE WILL FAIL WITHOUT GENERATING A
+		**	COMPILATION ERROR AND OTHER CONTRUCTOR FUNCTIONS WILL BE CHECKED
+		**	TO SEE IF ANYONE MATCHES THE REQUIRED CONSTRUCTION ARGUMENTS.
+		**
+		**	NOT FINDING A CONSTRUCTOR THAT MATCHES THE REQUIRED ARGUMENTS
+		**	WILL RESULT IN A COMPILATION ERROR.
+		**
+		**	IF is_inegral<InputIterator>::value == false THEN enable_if<>::type
+		**	EXISTS, BECAUSE THE FIRST typename OF THE enable_if TEMPLATE IS A
+		**	boolean WHICH, IF ITS VALUE IS true, WILL INSTANTIATE THE
+		**	enable_if<true, T> SPECIALIZATION TEMPLATE THAT DECLARES THE ::type
+		**	typename.
+		**
+		**	WHY CONVERT enable_if<>::type TO pointer (*)?
+		**	SO THAT WHEN THE RANGE CONSTRUCTOR MATCHES THE PASSED ARGUMENTS,
+		**	THE 4TH ARGUMENT, WHICH IS JUST TO CHECK IF THE FIRST 2 ARGUMENTS
+		**	PASSED TO THE CONSTRUCTOR ARE NOT INTEGRAL, WILL BE INITIALIZED TO
+		**	0 BY DEFAULT WITHOUT MATTERING WHAT IS THE TYPE THAT RETURNS
+		**	enable_if<>::type AS IT IS CONVERTED TO A POINTER, AND WILL NOT BE
+		**	USED.
+		*/
+		template< typename InputIterator >
 		vector< T, Alloc >(InputIterator first, InputIterator last,
-			allocator_type const & alloc = allocator_type());*/
+			allocator_type const & alloc = allocator_type(),
+			typename
+			ft::enable_if< ft::is_integral<InputIterator>::value
+			== false >::type * = 0);
 		vector< T, Alloc >(vector< T, Alloc > const & src);
 		~vector< T, Alloc >(void);
 
@@ -123,14 +154,24 @@ namespace	ft
 		return ;
 	}
 
-	/*template< typename T, typename Alloc >
+	template< typename T, typename Alloc >
 	template< typename InputIterator >
 	vector<T, Alloc>::vector(InputIterator first, InputIterator last,
-		allocator_type const & alloc) : _alloc(alloc), _content(0), _size(last - first), _capacity(_size)
+		allocator_type const & alloc,
+		typename
+		ft::enable_if< ft::is_integral<InputIterator>::value == false >::type *)
+		: _alloc(alloc), _content(0), _size(last - first), _capacity(_size)
 	{
-		std::cout << "iter difference: " << last - first << std::endl;
+		size_type	i;
+
+		std::cout << "vector range Constructor called" << std::endl;
+		this->_allocate_content(this->_capacity);
+		for (i = 0; first + i != last; ++i)
+		{
+			this->_content[i] = *(first + i);
+		}
 		return ;
-	}*/
+	}
 
 	template< typename T, typename Alloc >
 	vector< T, Alloc >::vector(vector< T, Alloc > const & src)
