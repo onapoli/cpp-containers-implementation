@@ -1,8 +1,6 @@
 #ifndef VECTOR_ITER_H
 # define VECTOR_ITER_H
 
-# include "vector.hpp"
-
 namespace ft
 {
 
@@ -29,9 +27,8 @@ namespace ft
 
 		//Default constructor
 		vector_iter<T>(void);
-		vector_iter<T>(pointer v);
+		explicit vector_iter<T>(pointer v);
 		vector_iter<T>(vector_iter<T> const & src);
-		~vector_iter<T>(void);
 
 		vector_iter<T> &	operator=(vector_iter<T> const & rhs);
 		bool				operator!=(vector_iter<T> const & rhs) const;
@@ -79,13 +76,6 @@ namespace ft
 	{
 		std::cout << "vector_iter copy constructor called" << std::endl;
 		*this = src;
-		return ;
-	}
-
-	template< typename T >
-	vector_iter<T>::~vector_iter(void)
-	{
-		std::cout << "vector_iter destructor called" << std::endl;
 		return ;
 	}
 
