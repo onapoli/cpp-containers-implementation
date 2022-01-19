@@ -5,9 +5,8 @@
 # include <memory>
 # include <cstddef>
 # include "vector_iter.hpp"
-# include "reverse_iterator.hpp"
-# include "enable_if.hpp"
-# include "is_integral.hpp"
+# include "../iterator/iterator.hpp"
+# include "../type_traits/type_traits.hpp"
 
 namespace	ft
 {
@@ -112,6 +111,11 @@ namespace	ft
 		const_reference			operator[](size_type n) const;
 
 		// modifiers
+		void					assign(size_type n, value_type const & val);
+		template< typename InputIterator >
+		void					assign(InputIterator first, InputIterator last,
+			typename ft::enable_if< ft::is_integral<InputIterator>::value == false >::type * = 0);
+		void					clear(void);
 
 		// allocator
 		allocator_type			get_allocator(void) const;
@@ -190,8 +194,7 @@ namespace	ft
 	vector< T, Alloc >::~vector(void)
 	{
 		std::cout << "vector Destructor called" << std::endl;
-		if (this->_capacity)
-			this->_free_content();
+		this->_free_content();
 		return ;
 	}
 
@@ -448,6 +451,47 @@ namespace	ft
 		return (this->_content[n]);
 	}
 
+	// modifier Functions
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::assign(size_type n, value_type const & val)
+	{
+		this->_free_content();
+		this->_size = n;
+		this->_capacity = this->_size;
+		this->_allocate_content(this->_capacity, val);
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	template< typename InputIterator >
+	void	vector< T, Alloc >::assign(InputIterator first, InputIterator last,
+				typename ft::enable_if< ft::is_integral<InputIterator>::value
+				== false >::type *)
+	{
+		size_type	i;
+
+		std::cout << "ASSIGN RANGED CALLED" << std::endl;
+		this->_free_content();
+		this->_size = last - first;
+		this->_capacity = this->_size;
+		this->_allocate_content(this->_capacity);
+		for (i = 0; first + i != last; ++i)
+		{
+			this->_content[i] = *(first + i);
+		}
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::clear(void)
+	{
+		this->_free_content();
+		this->_capacity = 0;
+		this->_size = 0;
+		return ;
+	}
+
 	// allocator Function
 
 	template< typename T, typename Alloc >
@@ -486,6 +530,8 @@ namespace	ft
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::_free_content(void)
 	{
+		if (!this->_capacity)
+			return ;
 		this->_alloc.destroy(this->_content);
 		this->_alloc.deallocate(this->_content, this->_capacity);
 		return ;
