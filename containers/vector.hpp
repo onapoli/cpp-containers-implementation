@@ -114,7 +114,10 @@ namespace	ft
 		void					assign(size_type n, value_type const & val);
 		template< typename InputIterator >
 		void					assign(InputIterator first, InputIterator last,
-			typename ft::enable_if< ft::is_integral<InputIterator>::value == false >::type * = 0);
+			typename ft::enable_if< ft::is_integral<InputIterator>::value
+			== false >::type * = 0);
+		void					push_back(value_type const & val);
+		void					pop_back(void);
 		void					clear(void);
 
 		// allocator
@@ -480,6 +483,34 @@ namespace	ft
 		{
 			this->_content[i] = *(first + i);
 		}
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::push_back(value_type const & val)
+	{
+		pointer		aux;
+		size_type	i;
+
+		if (this->_size + 1 > this->_capacity)
+		{
+			aux = this->_copy_content();
+			this->_modify_capacity(this->_size * 2);
+			for (i = 0; i < this->_size; ++i)
+			{
+				this->_content[i] = aux[i];
+			}
+		}
+		this->_content[this->_size] = val;
+		this->_size += 1;
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::pop_back(void)
+	{
+		if (this->_size)
+			this->_size -= 1;
 		return ;
 	}
 
