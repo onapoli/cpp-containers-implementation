@@ -46,8 +46,9 @@ namespace	ft
 		/*
 		**	HOW enable_if WORKS:
 		**
-		**	IF is_inegral<InputIterator>::value == true THERE WILL BE
-		**	NO enable_if<>::type, AND THANKS TO 'SFINAE', THE TYPE
+		**	IF is_integral<InputIterator>::value == true THERE WILL BE
+		**	NO enable_if<true, T>::type, AND THANKS TO C++'s
+		**	SFINAE (Substitution Failure Is Not An Error), THE TYPE
 		**	SUBSTITUTION FOR THIS TEMPLATE WILL FAIL WITHOUT GENERATING A
 		**	COMPILATION ERROR AND OTHER CONTRUCTOR FUNCTIONS WILL BE CHECKED
 		**	TO SEE IF ANYONE MATCHES THE REQUIRED CONSTRUCTION ARGUMENTS.
@@ -55,19 +56,19 @@ namespace	ft
 		**	NOT FINDING A CONSTRUCTOR THAT MATCHES THE REQUIRED ARGUMENTS
 		**	WILL RESULT IN A COMPILATION ERROR.
 		**
-		**	IF is_inegral<InputIterator>::value == false THEN enable_if<>::type
-		**	EXISTS, BECAUSE THE FIRST typename OF THE enable_if TEMPLATE IS A
-		**	boolean WHICH, IF ITS VALUE IS true, WILL INSTANTIATE THE
-		**	enable_if<true, T> SPECIALIZATION TEMPLATE THAT DECLARES THE ::type
-		**	typename.
+		**	IF is_integral<InputIterator>::value == false THEN
+		**	enable_if<true, T>::type EXISTS, BECAUSE THE FIRST typename OF
+		**	THE enable_if TEMPLATE IS A boolean WHICH, IF ITS VALUE IS true,
+		**	WILL INSTANTIATE THE enable_if<true, T> SPECIALIZATION TEMPLATE
+		**	THAT DECLARES THE ::type typename.
 		**
-		**	WHY CONVERT enable_if<>::type TO pointer (*)?
+		**	WHY CONVERT enable_if<true, T>::type TO pointer (*)?
 		**	SO THAT WHEN THE RANGE CONSTRUCTOR MATCHES THE PASSED ARGUMENTS,
 		**	THE 4TH ARGUMENT, WHICH IS JUST TO CHECK IF THE FIRST 2 ARGUMENTS
 		**	PASSED TO THE CONSTRUCTOR ARE NOT INTEGRAL, WILL BE INITIALIZED TO
 		**	0 BY DEFAULT WITHOUT MATTERING WHAT IS THE TYPE THAT RETURNS
-		**	enable_if<>::type AS IT IS CONVERTED TO A POINTER, AND WILL NOT BE
-		**	USED.
+		**	enable_if<true, T>::type AS IT IS CONVERTED TO A POINTER, AND WILL
+		**	NOT BE USED.
 		*/
 		template< typename InputIterator >
 		vector< T, Alloc >(InputIterator first, InputIterator last,
