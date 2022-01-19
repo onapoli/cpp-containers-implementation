@@ -165,7 +165,8 @@ namespace ft
 	}
 
 	template< typename T >
-	typename vector_iter<T>::difference_type	vector_iter<T>::operator-(vector_iter<T> const & rhs) const
+	typename vector_iter<T>::difference_type
+		vector_iter<T>::operator-(vector_iter<T> const & rhs) const
 	{
 		return (this->_v - rhs._v);
 	}
@@ -209,7 +210,8 @@ namespace ft
 	}
 
 	template< typename T >
-	typename vector_iter<T>::reference	vector_iter<T>::operator[](difference_type offset) const
+	typename vector_iter<T>::reference
+		vector_iter<T>::operator[](difference_type offset) const
 	{
 		return (*(this->_v + offset));
 	}

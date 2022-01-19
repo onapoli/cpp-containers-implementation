@@ -1,13 +1,18 @@
 #ifndef	ITERATOR_TRAITS_H
 # define ITERATOR_TRAITS_H
 
+/*
+**	USING struct INSTEAD OF class BECAUSE THERE ARENT ANY PRIVATE FUNCTIONS
+**	OR VARIABLES FOR THESE classes, AND struct USES THE PUBLIC SCOPE
+**	BY DEFAULT.
+*/
+
 namespace	ft
 {
 
 	template< typename Iterator >
-	class	iterator_traits
+	struct	iterator_traits
 	{
-	public:
 		typedef typename Iterator::difference_type		difference_type;
 		typedef typename Iterator::value_type			value_type;
 		typedef typename Iterator::pointer				pointer;
@@ -23,9 +28,8 @@ namespace	ft
 	*/
 
 	template< typename Iterator >
-	class	iterator_traits< Iterator * >
+	struct	iterator_traits< Iterator * >
 	{
-	public:
 		typedef Iterator						value_type;
 		typedef	Iterator*						pointer;
 		typedef Iterator&						reference;
@@ -34,9 +38,8 @@ namespace	ft
 	};
 
 	template< typename Iterator >
-	class	iterator_traits< const Iterator * >
+	struct	iterator_traits< const Iterator * >
 	{
-	public:
 		typedef Iterator						value_type;
 		typedef	const Iterator*					pointer;
 		typedef const Iterator&					reference;

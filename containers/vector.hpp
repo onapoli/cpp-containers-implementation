@@ -196,8 +196,8 @@ namespace	ft
 	}
 
 	template< typename T, typename Alloc >
-	vector< T, Alloc > &	vector< T,
-		Alloc >::operator=(vector< T, Alloc > const & rhs)
+	vector< T, Alloc > &
+		vector< T, Alloc >::operator=(vector< T, Alloc > const & rhs)
 	{
 		size_type	i;
 
@@ -222,15 +222,16 @@ namespace	ft
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::iterator	vector< T, Alloc >::begin(void)
 	{
-		typename vector< T, Alloc >::iterator	it(this->_content);
+		iterator	it(this->_content);
 
 		return (it);
 	}
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::const_iterator	vector< T, Alloc >::begin(void) const
+	typename vector< T, Alloc >::const_iterator
+		vector< T, Alloc >::begin(void) const
 	{
-		typename vector< T, Alloc >::const_iterator	it(this->_content);
+		const_iterator	it(this->_content);
 
 		return (it);
 	}
@@ -238,15 +239,16 @@ namespace	ft
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::iterator	vector< T, Alloc >::end(void)
 	{
-		typename vector< T, Alloc >::iterator	it(this->_content + this->_size);
+		iterator	it(this->_content + this->_size);
 
 		return (it);
 	}
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::const_iterator	vector< T, Alloc >::end(void) const
+	typename vector< T, Alloc >::const_iterator
+		vector< T, Alloc >::end(void) const
 	{
-		typename vector< T, Alloc >::const_iterator	it(this->_content + this->_size);
+		const_iterator	it(this->_content + this->_size);
 
 		return (it);
 	}
@@ -290,14 +292,15 @@ namespace	ft
 	// capacity Functions
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::size_type	vector< T, Alloc >::size(void) const
+	typename vector< T, Alloc >::size_type
+		vector< T, Alloc >::size(void) const
 	{
 		return (this->_size);
 	}
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::size_type	vector< T,
-		Alloc >::capacity(void) const
+	typename vector< T, Alloc >::size_type
+		vector< T, Alloc >::capacity(void) const
 	{
 		return (this->_capacity);
 	}
@@ -309,8 +312,8 @@ namespace	ft
 	}
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::size_type	vector< T,
-		Alloc >::max_size(void) const
+	typename vector< T, Alloc >::size_type
+		vector< T, Alloc >::max_size(void) const
 	{
 		return (this->_alloc.max_size());
 	}
@@ -448,8 +451,8 @@ namespace	ft
 	// allocator Function
 
 	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::allocator_type	vector< T,
-		Alloc >::get_allocator(void) const
+	typename vector< T, Alloc >::allocator_type
+		vector< T, Alloc >::get_allocator(void) const
 	{
 		return (this->_alloc);
 	}
