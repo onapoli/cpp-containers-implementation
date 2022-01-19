@@ -87,6 +87,10 @@ namespace	ft
 		const_iterator			begin(void) const;
 		iterator				end(void);
 		const_iterator			end(void) const;
+		reverse_iterator		rbegin(void);
+		const_reverse_iterator	rbegin(void) const;
+		reverse_iterator		rend(void);
+		const_reverse_iterator	rend(void) const;
 
 		// capacity
 		size_type				size(void) const;
@@ -243,6 +247,42 @@ namespace	ft
 	typename vector< T, Alloc >::const_iterator	vector< T, Alloc >::end(void) const
 	{
 		typename vector< T, Alloc >::const_iterator	it(this->_content + this->_size);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::reverse_iterator
+		vector< T, Alloc >::rbegin(void)
+	{
+		reverse_iterator	it(this->_content + this->_size);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::const_reverse_iterator
+		vector< T, Alloc >::rbegin(void) const
+	{
+		const_reverse_iterator	it(this->_content + this->_size);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::reverse_iterator
+		vector< T, Alloc >::rend(void)
+	{
+		reverse_iterator	it(this->_content);
+
+		return (it);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::const_reverse_iterator
+		vector< T, Alloc >::rend(void) const
+	{
+		const_reverse_iterator	it(this->_content);
 
 		return (it);
 	}
