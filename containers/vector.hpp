@@ -112,12 +112,24 @@ namespace	ft
 
 		// modifiers
 		void					assign(size_type n, value_type const & val);
+		//assign template
 		template< typename InputIterator >
 		void					assign(InputIterator first, InputIterator last,
 			typename ft::enable_if< ft::is_integral<InputIterator>::value
 			== false >::type * = 0);
 		void					push_back(value_type const & val);
 		void					pop_back(void);
+		iterator				insert(iterator position,
+									value_type const & val);
+		void					insert(iterator position, size_type n,
+									const value_type& val);
+		//insert template
+		template< typename InputIterator >
+    	void					insert(iterator position, InputIterator first,
+									InputIterator last,
+									typename ft::enable_if
+									< ft::is_integral<InputIterator>::value
+									== false >::type * = 0);
 		void					clear(void);
 
 		// allocator
@@ -138,6 +150,24 @@ namespace	ft
 		void			_free_content(void);
 		void			_modify_capacity(size_type new_cap,
 							value_type val = value_type());
+		void			_move_values_back(size_type from_index,
+							size_type positions);
+		void			_construct_insert(pointer aux, size_type needle,
+							value_type const & val, size_type n);
+		template< typename InputIterator >
+		void			_construct_insert(pointer aux, size_type needle,
+							InputIterator first, InputIterator last,
+							typename ft::enable_if
+							< ft::is_integral<InputIterator>::value
+							== false >::type * = 0);
+		void			_fill_content(size_type start_pos, size_type end_pos,
+							value_type const & val);
+		template< typename InputIterator >
+		void			_fill_content(size_type position, InputIterator first,
+							InputIterator last, typename ft::enable_if
+							< ft::is_integral<InputIterator>::value
+							== false >::type * = 0);
+
 
 	};
 
@@ -515,6 +545,89 @@ namespace	ft
 	}
 
 	template< typename T, typename Alloc >
+	typename vector<T, Alloc>::iterator
+		vector< T, Alloc >::insert(iterator position, value_type const & val)
+	{
+		size_type	pos_index;
+		pointer		aux;
+
+		pos_index = position - this->begin();
+		if (this->_size == this->_capacity)
+		{
+			aux = this->_alloc.allocate(this->_capacity * 2);
+			this->_construct_insert(aux, pos_index, val, 1);
+			this->_free_content();
+			this->_content = aux;	
+			this->_capacity *= 2;
+		}
+		else
+		{
+			this->_move_values_back(pos_index, 1);
+			this->_content[pos_index] = val;
+		}
+		this->_size += 1;
+		return (this->begin() + pos_index);
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::insert(iterator position, size_type n,
+				value_type const & val)
+	{
+		size_type	pos_index;
+		pointer		aux;
+
+		pos_index = position - this->begin();
+		if (this->_size + n > this->_capacity)
+		{
+			aux = this->_alloc.allocate(this->_capacity * 2 >= this->_size + n
+				? this->_capacity * 2 : this->_size + n);
+			this->_construct_insert(aux, pos_index, val, n);
+			this->_free_content();
+			this->_content = aux;
+			this->_capacity = this->_size + n >= this->_capacity * 2
+				? this->_size + n : this->_capacity * 2;
+		}
+		else
+		{
+			this->_move_values_back(pos_index, n);
+			this->_fill_content(pos_index, pos_index + n, val);
+		}
+		this->_size += n;
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	template< typename InputIterator >
+    void	vector<T, Alloc>::insert(iterator position, InputIterator first,
+				InputIterator last, typename ft::enable_if
+				< ft::is_integral<InputIterator>::value == false >::type *)
+	{
+		pointer			aux;
+		size_type		pos_index;
+		size_type		n;
+
+		pos_index = position - this->begin();
+		n = last - first;
+		if (this->_size + n > this->_capacity)
+		{
+			aux = this->_alloc.allocate(this->_capacity * 2 >= this->_size + n
+				? this->_capacity * 2 : this->_size + n);
+			this->_construct_insert(aux, pos_index, first, last);
+			this->_free_content();
+			this->_content = aux;
+			this->_capacity = this->_size + n >= this->_capacity * 2
+				? this->_size + n : this->_capacity * 2;
+		}
+		else
+		{
+			this->_move_values_back(pos_index, n);
+			this->_fill_content(pos_index, first, last);
+		}
+		this->_size += n;
+		return ;
+	}
+
+	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::clear(void)
 	{
 		this->_free_content();
@@ -575,6 +688,96 @@ namespace	ft
 		this->_free_content();
 		this->_capacity = new_cap;
 		this->_allocate_content(this->_capacity, val);
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::_move_values_back(size_type from_index,
+				size_type positions)
+	{
+		size_type	i;
+	
+		for (i = this->_size - 1; i > from_index; --i)
+		{
+			this->_content[i + positions] = this->_content[i];
+		}
+		this->_content[i + positions] = this->_content[i];
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::_construct_insert(pointer aux, size_type needle,
+				value_type const & val, size_type n)
+	{
+		size_type	i;
+		size_type	j;
+
+		for (i = 0; i < needle; ++i)
+		{
+			this->_alloc.construct(aux + i, this->_content[i]);
+		}
+		for (i = needle; i < needle + n; ++i)
+		{
+			this->_alloc.construct(aux + i, val);
+		}
+		for (j = needle; j < this->_size; ++j, ++i)
+		{
+			this->_alloc.construct(aux + i, this->_content[j]);
+		}
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	template< typename InputIterator >
+	void	vector< T, Alloc >::_construct_insert(pointer aux, size_type needle,
+				InputIterator first, InputIterator last, typename ft::enable_if
+				< ft::is_integral<InputIterator>::value == false >::type *)
+	{
+		size_type		i;
+		size_type		j;
+		InputIterator	it;
+
+		for (i = 0; i < needle; ++i)
+		{
+			this->_alloc.construct(aux + i, this->_content[i]);
+		}
+		for (it = first; it != last; ++it, ++i)
+		{
+			this->_alloc.construct(aux + i, *it);
+		}
+		for (j = needle; j < this->_size; ++j, ++i)
+		{
+			this->_alloc.construct(aux + i, this->_content[j]);
+		}
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::_fill_content(size_type start_pos,
+				size_type end_pos, value_type const & val)
+	{
+		size_type	i;
+
+		for (i = start_pos; i < end_pos; ++i)
+		{
+			this->_content[i] = val;
+		}
+		return ;
+	}
+
+	template< typename T, typename Alloc >
+	template< typename InputIterator >
+	void	vector< T, Alloc >::_fill_content(size_type position,
+				InputIterator first, InputIterator last, typename ft::enable_if
+				< ft::is_integral<InputIterator>::value == false >::type *)
+	{
+		size_type		i;
+		InputIterator	it;
+
+		for (i = position, it = first; it != last; ++i, ++it)
+		{
+			this->_content[i] = *it;
+		}
 		return ;
 	}
 
