@@ -291,6 +291,83 @@ void	modifier_insert(void)
 	return ;
 }
 
+void	modifier_erase(void)
+{
+	std::cout << "\n\n--- MODIFIER ERASE TESTS ---\n";
+	ft::vector<int>				v(5, 500);
+	ft::vector<int>::iterator	it;
+	int							i;
+
+	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
+	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
+	{
+		*it = i;
+		std::cout << "index: " << i << " value: " << *it << "\n";
+	}
+	std::cout << "EXECUTED v.erase(v.begin() + 2)" << "\n";
+	v.erase(v.begin() + 2);
+	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
+	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
+	{
+		std::cout << "index: " << i << " value: " << *it << "\n";
+	}
+	std::cout << "EXECUTED v.erase(v.begin())" << "\n";
+	v.erase(v.begin());
+	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
+	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
+	{
+		std::cout << "index: " << i << " value: " << *it << "\n";
+	}
+	std::cout << "EXECUTED v.erase(v.begin())" << "\n";
+	v.erase(v.end() - 1);
+	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
+	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
+	{
+		std::cout << "index: " << i << " value: " << *it << "\n";
+	}
+	return ;
+}
+
+void	modifier_swap(void)
+{
+	std::cout << "\n\n--- MODIFIER SWAP TESTS ---\n";
+	ft::vector<int>				v(5, 500);
+	ft::vector<int>				v2(2, 200);
+	ft::vector<int>::iterator	it;
+
+	std::cout << "vector v:\n";
+	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
+	std::cout << v.capacity() << "\n";
+	for (it = v.begin(); it != v.end(); ++it)
+	{
+		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
+	}
+	std::cout << "vector v2:\n";
+	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
+	std::cout << v2.capacity() << "\n";
+	for (it = v2.begin(); it != v2.end(); ++it)
+	{
+		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
+	}
+	v.swap(v2);
+	std::cout << "\nEXECUTED v.swap(v2)\n\n";
+	std::cout << "vector v:\n";
+	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
+	std::cout << v.capacity() << "\n";
+	for (it = v.begin(); it != v.end(); ++it)
+	{
+		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
+	}
+	std::cout << "vector v2:\n";
+	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
+	std::cout << v2.capacity() << "\n";
+	for (it = v2.begin(); it != v2.end(); ++it)
+	{
+		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
+	}
+	return ;
+}
+
 int	main(void)
 {
 	construction();
@@ -306,5 +383,7 @@ int	main(void)
 	modifier_assign();
 	modifier_push_pop_back();
 	modifier_insert();
+	modifier_erase();
+	modifier_swap();
 	return (0);
 }
