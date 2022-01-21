@@ -144,7 +144,6 @@ namespace	ft
 		size_type		_capacity;
 
 		// Functions
-		pointer			_copy_content(void) const;
 		void			_allocate_content(size_type n,
 							value_type val = value_type());
 		void			_free_content(void);
@@ -357,22 +356,14 @@ namespace	ft
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::resize(size_type n, value_type val)
 	{
-		pointer		aux;
 		size_type	i;
 
 		//TEST CASE: n = 0
 
 		// Will reallocate memory if new size is greater than current capacity.
 		if (n > this->_capacity)
-		{
-			aux = this->_copy_content();
-			this->_modify_capacity(this->_size * 2 >= n ? this->_size * 2 : n,
-				val);
-			for (i = 0; i < this->_size; ++i)
-				this->_content[i] = aux[i];
-			delete [] aux;
-			this->_size = n;
-		}
+			this->_modify_capacity(this->_size * 2 >= n
+				? this->_size * 2 : n, val);
 		/*
 		** Will reallocate memory if n is more than 2 times lower than current
 		** capacity to optimize memory usage.
@@ -381,14 +372,7 @@ namespace	ft
 		{
 			if (static_cast<float>(this->_capacity) / static_cast<float>(n)
 				> static_cast<float>(2))
-			{
-				aux = this->_copy_content();
 				this->_modify_capacity(n * 2, val);
-				this->_size = n;
-				for (i = 0; i < this->_size; ++i)
-					this->_content[i] = aux[i];
-				delete [] aux;
-			}
 		}
 		/*
 		** If any memory reallocation was done, this->_size would be equal to n,
@@ -403,16 +387,9 @@ namespace	ft
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::reserve(size_type n)
 	{
-		pointer		aux;
-		size_type	i;
-
 		if (n <= this->_capacity)
 			return ;
-		aux = this->_copy_content();
 		this->_modify_capacity(n);
-		for (i = 0; i < this->_size; ++i)
-			this->_content[i] = aux[i];
-		delete [] aux;
 		return ;
 	}
 
@@ -508,10 +485,10 @@ namespace	ft
 		this->_free_content();
 		this->_size = last - first;
 		this->_capacity = this->_size;
-		this->_allocate_content(this->_capacity);
+		this->_content = this->_alloc.allocate(this->_capacity);
 		for (i = 0; first + i != last; ++i)
 		{
-			this->_content[i] = *(first + i);
+			this->_alloc.construct(this->_content + i, *(first + i));
 		}
 		return ;
 	}
@@ -519,17 +496,9 @@ namespace	ft
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::push_back(value_type const & val)
 	{
-		pointer		aux;
-		size_type	i;
-
 		if (this->_size + 1 > this->_capacity)
 		{
-			aux = this->_copy_content();
 			this->_modify_capacity(this->_size * 2);
-			for (i = 0; i < this->_size; ++i)
-			{
-				this->_content[i] = aux[i];
-			}
 		}
 		this->_content[this->_size] = val;
 		this->_size += 1;
@@ -647,18 +616,6 @@ namespace	ft
 
 	// Private Members
 
-	template< typename T, typename Alloc >
-	typename vector< T, Alloc >::pointer
-		vector< T, Alloc >::_copy_content(void) const
-	{
-		pointer		aux;
-		size_type	i;
-
-		aux = new value_type[this->_size];
-		for (i = 0; i < this->_size; ++i)
-			aux[i] = this->_content[i];
-		return (aux);
-	}
 
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::_allocate_content(size_type n, value_type val)
@@ -685,9 +642,17 @@ namespace	ft
 	void	vector< T, Alloc >::_modify_capacity(size_type new_cap,
 		value_type val)
 	{
+		pointer		aux;
+		size_type	i;
+
+		aux = this->_alloc.allocate(new_cap);
+		for (i = 0; i < this->_size; ++i)
+			this->_alloc.construct(aux + i, this->_content[i]);
 		this->_free_content();
 		this->_capacity = new_cap;
-		this->_allocate_content(this->_capacity, val);
+		for (i = this->_size; i < this->_capacity; ++i)
+			this->_alloc.construct(aux + i, val);
+		this->_content = aux;
 		return ;
 	}
 
@@ -709,9 +674,11 @@ namespace	ft
 	void	vector< T, Alloc >::_construct_insert(pointer aux, size_type needle,
 				value_type const & val, size_type n)
 	{
+		size_type	new_capacity;
 		size_type	i;
 		size_type	j;
 
+		new_capacity = this->_capacity + n;
 		for (i = 0; i < needle; ++i)
 		{
 			this->_alloc.construct(aux + i, this->_content[i]);
@@ -724,6 +691,10 @@ namespace	ft
 		{
 			this->_alloc.construct(aux + i, this->_content[j]);
 		}
+		for (; i < new_capacity; ++i)
+		{
+			this->_alloc.construct(aux + i, val);
+		}
 		return ;
 	}
 
@@ -733,10 +704,12 @@ namespace	ft
 				InputIterator first, InputIterator last, typename ft::enable_if
 				< ft::is_integral<InputIterator>::value == false >::type *)
 	{
+		size_type		new_capacity;
 		size_type		i;
 		size_type		j;
 		InputIterator	it;
 
+		new_capacity = this->_capacity + (last - first);
 		for (i = 0; i < needle; ++i)
 		{
 			this->_alloc.construct(aux + i, this->_content[i]);
@@ -748,6 +721,10 @@ namespace	ft
 		for (j = needle; j < this->_size; ++j, ++i)
 		{
 			this->_alloc.construct(aux + i, this->_content[j]);
+		}
+		for (; i < new_capacity; ++i)
+		{
+			this->_alloc.construct(aux + i, *first);
 		}
 		return ;
 	}
