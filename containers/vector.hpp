@@ -130,6 +130,8 @@ namespace	ft
 									typename ft::enable_if
 									< ft::is_integral<InputIterator>::value
 									== false >::type * = 0);
+		iterator				erase(iterator position);
+		iterator				erase(iterator first, iterator last);
 		void					clear(void);
 
 		// allocator
@@ -594,6 +596,40 @@ namespace	ft
 		}
 		this->_size += n;
 		return ;
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::iterator
+		vector< T, Alloc >::erase(iterator position)
+	{
+		size_type	pos_index;
+		size_type	i;
+
+		pos_index = position - this->begin();
+		for (i = pos_index + 1; i < this->_size; ++i)
+		{
+			this->_content[i - 1] = this->_content[i];
+		}
+		this->resize(this->_size - 1);
+		return (this->begin() + pos_index);
+	}
+
+	template< typename T, typename Alloc >
+	typename vector< T, Alloc >::iterator
+		vector< T, Alloc >::erase(iterator first, iterator last)
+	{
+		size_type	pos_index;
+		size_type	num_elements;
+		size_type	i;
+
+		pos_index = first - this->begin();
+		num_elements = last - first;
+		for (i = pos_index + num_elements; i < this->_size; ++i)
+		{
+			this->_content[i - num_elements] = this->_content[i];
+		}
+		this->_resize(this->_size - num_elements);
+		return (this->_begin() + pos_index);
 	}
 
 	template< typename T, typename Alloc >
