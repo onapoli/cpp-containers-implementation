@@ -132,6 +132,7 @@ namespace	ft
 									== false >::type * = 0);
 		iterator				erase(iterator position);
 		iterator				erase(iterator first, iterator last);
+		void 					swap(vector & x);
 		void					clear(void);
 
 		// allocator
@@ -630,6 +631,28 @@ namespace	ft
 		}
 		this->_resize(this->_size - num_elements);
 		return (this->_begin() + pos_index);
+	}
+
+	template< typename T, typename Alloc >
+	void	vector< T, Alloc >::swap(vector<T, Alloc> & x)
+	{
+		pointer	aux_content;
+		size_type	aux_capacity;
+		size_type	aux_size;
+
+		if (this != &x)
+		{
+			aux_content = this->_content;
+			aux_capacity = this->_capacity;
+			aux_size = this->_size;
+			this->_content = x._content;
+			this->_capacity = x._capacity;
+			this->_size = x._size;
+			x._content = aux_content;
+			x._capacity = aux_capacity;
+			x._size = aux_size;
+		}
+		return ;
 	}
 
 	template< typename T, typename Alloc >
