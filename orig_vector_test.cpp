@@ -165,6 +165,32 @@ void	insert(void)
 	return ;
 }
 
+void	non_member_relational(void)
+{
+	std::cout << "\n\n--- RELATIONAL TESTS ---\n";
+	std::vector<int>	v(2, 200);
+	std::vector<int>	v2(v);
+
+	std::cout << "v(2, 200)\nv2(v)\n";
+	std::cout << std::boolalpha;
+	std::cout << "v == v2 ? " << (v == v2) << "\n";
+	std::cout << "v >= v2 ? " << (v >= v2) << "\n";
+	std::cout << "v != v2 ? " << (v != v2) << "\n";
+	v.back() = 201;
+	std::cout << "\nEXECUTED v.back() = 201\n\n";
+	std::cout << "v > v2 ? " << (v > v2) << "\n";
+	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	v2.push_back(200);
+	std::cout << "\nEXECUTED v2.push_back(200)\n\n";
+	std::cout << "v > v2 ? " << (v > v2) << "\n";
+	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	v.back() = 200;
+	std::cout << "\nEXECUTED v.back() = 200\n\n";
+	std::cout << "v > v2 ? " << (v > v2) << "\n";
+	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	return ;
+}
+
 int	main(void)
 {
 	range_constructor();
@@ -176,5 +202,6 @@ int	main(void)
 	reverse_iter();
 	push_pop();
 	insert();
+	non_member_relational();
 	return (0);
 }
