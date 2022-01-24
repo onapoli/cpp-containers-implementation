@@ -7,6 +7,7 @@
 # include "vector_iter.hpp"
 # include "../iterator/iterator.hpp"
 # include "../type_traits/type_traits.hpp"
+# include "../algorithm/algorithm.hpp"
 
 namespace	ft
 {
@@ -825,6 +826,51 @@ namespace	ft
 		if (&x != &y)
 			x.swap(y);
 		return ;
+	}
+
+	template < typename T, typename Alloc >
+	bool	operator==(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return (false);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+
+	template < typename T, typename Alloc >
+	bool	operator!=(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		return (!(lhs == rhs));
+	}
+
+	template <typename T, typename Alloc>
+	bool	operator<(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+			rhs.begin(), rhs.end()));
+	}
+
+	template <typename T, typename Alloc>
+	bool	operator<=(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		return (!(rhs < lhs));
+	}
+
+	template <typename T, typename Alloc>
+	bool	operator>(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		return (rhs < lhs);
+	}
+
+	template <typename T, typename Alloc>
+	bool	operator>=(vector< T, Alloc > const & lhs,
+				vector< T, Alloc > const & rhs)
+	{
+		return (!(lhs < rhs));
 	}
 
 }
