@@ -1,9 +1,9 @@
 #ifndef VECTOR_H
 # define VECTOR_H
 
-# include <iostream>
 # include <memory>
 # include <cstddef>
+
 # include "vector_iter.hpp"
 # include "../iterator/iterator.hpp"
 # include "../type_traits/type_traits.hpp"
@@ -814,6 +814,16 @@ namespace	ft
 		{
 			this->_content[i] = *it;
 		}
+		return ;
+	}
+
+	//Non-member function overloads
+
+	template< typename T, typename Alloc >
+	void	swap(vector<T,Alloc> & x, vector<T,Alloc> & y)
+	{
+		if (&x != &y)
+			x.swap(y);
 		return ;
 	}
 
