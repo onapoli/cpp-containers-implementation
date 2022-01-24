@@ -183,16 +183,6 @@ void	rev_iter(void)
 	return ;
 }
 
-/*void	is_integral_test(void)
-{
-	std::cout << "\n\n--- IS INTEGRAL TESTS ---\n";
-	std::cout << std::boolalpha;
-	std::cout << "int is integral? " << ft::is_integral<int>::value << std::endl;
-	std::cout << "char is integral? " << ft::is_integral<char>::value << std::endl;
-	std::cout << "float is integral? " << ft::is_integral<float>::value << std::endl;
-	return ;
-}*/
-
 void	modifier_assign(void)
 {
 	std::cout << "\n\n--- ASSIGN TESTS ---\n";
@@ -421,7 +411,6 @@ int	main(void)
 	iterator_constness();
 	iter_traits();
 	rev_iter();
-	//is_integral_test();
 	modifier_assign();
 	modifier_push_pop_back();
 	modifier_insert();
