@@ -1,6 +1,8 @@
+#include <iostream>
+#include <typeinfo>
+
 #include "./containers/vector.hpp"
 #include "./type_traits/type_traits.hpp"
-#include <typeinfo>
 
 // default, fill, range and copy Contructor tests.
 void	construction(void)
@@ -181,7 +183,7 @@ void	rev_iter(void)
 	return ;
 }
 
-void	is_integral_test(void)
+/*void	is_integral_test(void)
 {
 	std::cout << "\n\n--- IS INTEGRAL TESTS ---\n";
 	std::cout << std::boolalpha;
@@ -189,7 +191,7 @@ void	is_integral_test(void)
 	std::cout << "char is integral? " << ft::is_integral<char>::value << std::endl;
 	std::cout << "float is integral? " << ft::is_integral<float>::value << std::endl;
 	return ;
-}
+}*/
 
 void	modifier_assign(void)
 {
@@ -368,6 +370,46 @@ void	modifier_swap(void)
 	return ;
 }
 
+void	non_member_swap(void)
+{
+	std::cout << "\n\n--- MODIFIER SWAP TESTS ---\n";
+	ft::vector<int>				v(5, 500);
+	ft::vector<int>				v2(2, 200);
+	ft::vector<int>::iterator	it;
+
+	std::cout << "vector v:\n";
+	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
+	std::cout << v.capacity() << "\n";
+	for (it = v.begin(); it != v.end(); ++it)
+	{
+		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
+	}
+	std::cout << "vector v2:\n";
+	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
+	std::cout << v2.capacity() << "\n";
+	for (it = v2.begin(); it != v2.end(); ++it)
+	{
+		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
+	}
+	ft::swap(v, v2);
+	std::cout << "\nEXECUTED ft::swap(v, v2)\n\n";
+	std::cout << "vector v:\n";
+	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
+	std::cout << v.capacity() << "\n";
+	for (it = v.begin(); it != v.end(); ++it)
+	{
+		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
+	}
+	std::cout << "vector v2:\n";
+	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
+	std::cout << v2.capacity() << "\n";
+	for (it = v2.begin(); it != v2.end(); ++it)
+	{
+		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
+	}
+	return ;
+}
+
 int	main(void)
 {
 	construction();
@@ -379,11 +421,12 @@ int	main(void)
 	iterator_constness();
 	iter_traits();
 	rev_iter();
-	is_integral_test();
+	//is_integral_test();
 	modifier_assign();
 	modifier_push_pop_back();
 	modifier_insert();
 	modifier_erase();
 	modifier_swap();
+	non_member_swap();
 	return (0);
 }
