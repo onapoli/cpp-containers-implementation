@@ -245,7 +245,7 @@ namespace	ft
 			if (this->_capacity != rhs._capacity)
 			{
 				this->_free_content();
-				this->_alloc.allocate(this->_capacity);
+				this->_content = this->_alloc.allocate(rhs._capacity);
 				for (i = 0; i < rhs._size; ++i)
 					this->_alloc.construct(this->_content + i, rhs._content[i]);
 				for (; i < rhs._capacity; ++i)
@@ -534,7 +534,7 @@ namespace	ft
 		pos_index = position - this->begin();
 		if (this->_size == this->_capacity)
 		{
-			new_capacity = this->_capacity ? this->capacity * 2 : 2;
+			new_capacity = this->_capacity ? this->_capacity * 2 : 2;
 			aux = this->_alloc.allocate(new_capacity);
 			this->_construct_insert(aux, pos_index, val, 1);
 			this->_free_content();
