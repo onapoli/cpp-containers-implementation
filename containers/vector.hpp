@@ -242,16 +242,22 @@ namespace	ft
 
 		if (this != &rhs)
 		{
-			if (this->_capacity && this->_capacity < rhs._capacity)
-				this->_free_content();
-			if (this->_capacity < rhs._capacity)
+			if (this->_capacity != rhs._capacity)
 			{
+				this->_free_content();
+				this->_alloc.allocate(this->_capacity);
+				for (i = 0; i < rhs._size; ++i)
+					this->_alloc.construct(this->_content + i, rhs._content[i]);
+				for (; i < rhs._capacity; ++i)
+					this->_alloc.construct(this->_content + i, value_type());
 				this->_capacity = rhs._capacity;
-				this->_allocate_content(this->_capacity);
+			}
+			else
+			{
+				for (i = 0; i < rhs._size; ++i)
+					this->_content[i] = rhs._content[i];
 			}
 			this->_size = rhs._size;
-			for (i = 0; i < this->_size; ++i)
-				this->_content[i] = rhs._content[i];
 		}
 		return (*this);
 	}
@@ -502,7 +508,7 @@ namespace	ft
 	{
 		if (this->_size + 1 > this->_capacity)
 		{
-			this->_modify_capacity(this->_size * 2);
+			this->_modify_capacity(this->_size ? this->_size * 2 : 2);
 		}
 		this->_content[this->_size] = val;
 		this->_size += 1;
@@ -523,15 +529,17 @@ namespace	ft
 	{
 		size_type	pos_index;
 		pointer		aux;
+		size_type	new_capacity;
 
 		pos_index = position - this->begin();
 		if (this->_size == this->_capacity)
 		{
-			aux = this->_alloc.allocate(this->_capacity * 2);
+			new_capacity = this->_capacity ? this->capacity * 2 : 2;
+			aux = this->_alloc.allocate(new_capacity);
 			this->_construct_insert(aux, pos_index, val, 1);
 			this->_free_content();
-			this->_content = aux;	
-			this->_capacity *= 2;
+			this->_content = aux;
+			this->_capacity = new_capacity;
 		}
 		else
 		{
@@ -548,17 +556,18 @@ namespace	ft
 	{
 		size_type	pos_index;
 		pointer		aux;
+		size_type	new_capacity;
 
 		pos_index = position - this->begin();
 		if (this->_size + n > this->_capacity)
 		{
-			aux = this->_alloc.allocate(this->_capacity * 2 >= this->_size + n
-				? this->_capacity * 2 : this->_size + n);
+			new_capacity = this->_capacity * 2 >= this->_size + n
+				? this->_capacity * 2 : this->_size + n;
+			aux = this->_alloc.allocate(new_capacity);
 			this->_construct_insert(aux, pos_index, val, n);
 			this->_free_content();
 			this->_content = aux;
-			this->_capacity = this->_size + n >= this->_capacity * 2
-				? this->_size + n : this->_capacity * 2;
+			this->_capacity = new_capacity;
 		}
 		else
 		{
@@ -575,21 +584,22 @@ namespace	ft
 				InputIterator last, typename ft::enable_if
 				< ft::is_integral<InputIterator>::value == false >::type *)
 	{
-		pointer			aux;
-		size_type		pos_index;
-		size_type		n;
+		pointer		aux;
+		size_type	pos_index;
+		size_type	n;
+		size_type	new_capacity;
 
 		pos_index = position - this->begin();
 		n = last - first;
 		if (this->_size + n > this->_capacity)
 		{
-			aux = this->_alloc.allocate(this->_capacity * 2 >= this->_size + n
-				? this->_capacity * 2 : this->_size + n);
+			new_capacity = this->_capacity * 2 >= this->_size + n
+				? this->_capacity * 2 : this->_size + n;
+			aux = this->_alloc.allocate(new_capacity);
 			this->_construct_insert(aux, pos_index, first, last);
 			this->_free_content();
 			this->_content = aux;
-			this->_capacity = this->_size + n >= this->_capacity * 2
-				? this->_size + n : this->_capacity * 2;
+			this->_capacity = new_capacity;
 		}
 		else
 		{
@@ -703,14 +713,16 @@ namespace	ft
 		value_type val)
 	{
 		pointer		aux;
+		size_type	end_old_content;
 		size_type	i;
 
 		aux = this->_alloc.allocate(new_cap);
-		for (i = 0; i < this->_size; ++i)
+		end_old_content = this->_size <= new_cap ? this->_size : new_cap;
+		for (i = 0; i < end_old_content; ++i)
 			this->_alloc.construct(aux + i, this->_content[i]);
 		this->_free_content();
 		this->_capacity = new_cap;
-		for (i = this->_size; i < this->_capacity; ++i)
+		for (i = end_old_content; i < this->_capacity; ++i)
 			this->_alloc.construct(aux + i, val);
 		this->_content = aux;
 		return ;
