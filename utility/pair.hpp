@@ -32,9 +32,9 @@ namespace	ft
 
 	template< typename T1, typename T2 >
 	template< typename U, typename V >
-	pair< T1, T2 >::pair(pair< U, V > const & pr)
+	pair< T1, T2 >::pair(pair< U, V > const & pr) : first(pr.first),
+		second(pr.second)
 	{
-		*this = pr;
 		return ;
 	}
 
