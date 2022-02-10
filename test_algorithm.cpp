@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "algorithm/algorithm.hpp"
 #include "containers/vector.hpp"
@@ -13,15 +14,12 @@ void	equal_test(void)
 
 	v4[2] = 200;
 	std::cout << std::boolalpha;
-	std::cout << "\nv(1, 100) equal v2(1, 100)? ";
-	std::cout << ft::equal(v.begin(), v.end(), v2.begin()) << "\n";
-	std::cout << "\nv(1, 100) equal v3(3, 300)? ";
-	std::cout << ft::equal(v.begin(), v.end(), v3.begin()) << "\n";
-	std::cout << "\nv3(3, 300) equal v4={300, 300, 200}? ";
-	std::cout << ft::equal(v3.begin(), v3.end(), v4.begin()) << "\n";
+	assert(ft::equal(v.begin(), v.end(), v2.begin()) == true);
+	assert(ft::equal(v.begin(), v.end(), v3.begin()) == false);
+	assert(ft::equal(v3.begin(), v3.end(), v4.begin()) == false);
 	v4 = v3;
-	std::cout << "\nv3(3, 300) equal v4(3, 300)? ";
-	std::cout << ft::equal(v3.begin(), v3.end(), v4.begin()) << "\n";
+	assert(ft::equal(v3.begin(), v3.end(), v4.begin()) == true);
+	std::cout << "\n\nEQUAL TESTS: OK\n\n";
 	return ;
 }
 
@@ -33,29 +31,18 @@ void	lexicographical_test(void)
 	ft::vector<int>			i(2, 20);
 	ft::vector<int>			i2(2, 20);
 
-	std::cout << "\nv(2, \"hola\") and v2(2, \"hola\") ";
-	std::cout << ft::lexicographical_compare(v.begin(), v.end(),
-	v2.begin(), v2.end()) << "\n";
+	assert(ft::lexicographical_compare(v.begin(), v.end(), v2.begin(), v2.end()) == false);
 	v2.back() = "adios";
-	std::cout << "\nv={\"hola\", \"hola\"} and v2={\"hola\", \"adios\"} ";
-	std::cout << ft::lexicographical_compare(v.begin(), v.end(),
-	v2.begin(), v2.end()) << "\n";
+	assert(ft::lexicographical_compare(v.begin(), v.end(), v2.begin(), v2.end()) == false);
 	v.back() = "adios";
 	v2.back() = "aloha";
-	std::cout << "\nv={\"hola\", \"adios\"} and v2={\"hola\", \"aloha\"} ";
-	std::cout << ft::lexicographical_compare(v.begin(), v.end(),
-	v2.begin(), v2.end()) << "\n";
-	std::cout << "\ni(2, 20) and i2(2, 20) ";
-	std::cout << ft::lexicographical_compare(i.begin(), i.end(),
-	i2.begin(), i2.end()) << "\n";
+	assert(ft::lexicographical_compare(v.begin(), v.end(), v2.begin(), v2.end()) == true);
+	assert(ft::lexicographical_compare(i.begin(), i.end(), i2.begin(), i2.end()) == false);
 	i2.back() = 10;
-	std::cout << "\ni(2, 20) and i2={20, 10} ";
-	std::cout << ft::lexicographical_compare(i.begin(), i.end(),
-	i2.begin(), i2.end()) << "\n";
+	assert(ft::lexicographical_compare(i.begin(), i.end(), i2.begin(), i2.end()) == false);
 	i.back() = 1;
-	std::cout << "\ni{20, 1} and i2={20, 10} ";
-	std::cout << ft::lexicographical_compare(i.begin(), i.end(),
-	i2.begin(), i2.end()) << "\n";
+	assert(ft::lexicographical_compare(i.begin(), i.end(), i2.begin(), i2.end()) == true);
+	std::cout << "\n\nLEXICOGRAPHICAL TESTS: OK\n\n";
 	return ;
 }
 
