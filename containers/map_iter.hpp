@@ -156,7 +156,6 @@ namespace	ft
 							this->_node->getValue().first))
 							break ;
 					}
-					//COMPROBAR SI ESTO ESTÄ BIEN
 					if (this->_comp(this->_node->getValue().first,
 						aux->getValue().first))
 					{
@@ -207,7 +206,6 @@ namespace	ft
 							aux->getValue().first))
 							break ;
 					}
-					//COMPROBAR SI ESTO ESTÄ BIEN
 					if (this->_comp(aux->getValue().first,
 						this->_node->getValue().first))
 					{
