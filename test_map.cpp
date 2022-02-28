@@ -20,7 +20,66 @@ void	construction(void)
 
 void	insertion(void)
 {
+	ft::map<int, int>	m;
+	/*
+	**	Pensar cómo comprobar con las funciones públicas de map
+	**	que un árbol es correcto.
+	**
+	**	IDEAS
+	**
+	**	1. Recorrerlo en orden y comprobar que el orden es correcto.
+	**	2. Comprobar key de extremos (first y last iterator)
+	*/
+	m.insert(ft::make_pair<int, int>(10, 10));
+	m.insert(ft::make_pair<int, int>(20, 20));
+	m.insert(ft::make_pair<int, int>(30, 30));
+	m.insert(ft::make_pair<int, int>(40, 40));
+	m.printTree();
+	m.insert(ft::make_pair<int, int>(50, 50));
+	m.printTree();
+	m.insert(ft::make_pair<int, int>(60, 60));
+	m.insert(ft::make_pair<int, int>(70, 70));
+	m.insert(ft::make_pair<int, int>(80, 80));
+	m.printTree();
 	std::cout << "\nINSERTION TESTS: OK\n";
+	return ;
+}
+
+void	erase(void)
+{
+	ft::map<int, int>	m;
+	std::size_t			res;
+	/*
+	**	Pensar cómo comprobar con las funciones públicas de map
+	**	que un árbol es correcto.
+	**
+	**	IDEAS
+	**
+	**	1. Recorrerlo en orden y comprobar que el orden es correcto.
+	**	2. Comprobar key de extremos (first y last iterator)
+	*/
+	m.insert(ft::make_pair<int, int>(10, 10));
+	m.insert(ft::make_pair<int, int>(20, 20));
+	m.insert(ft::make_pair<int, int>(30, 30));
+	m.insert(ft::make_pair<int, int>(40, 40));
+	m.insert(ft::make_pair<int, int>(50, 50));
+	m.insert(ft::make_pair<int, int>(60, 60));
+	res = m.erase(30);
+	assert(res == 1);
+	res = m.erase(50);
+	assert(res == 1);
+	res = m.erase(42);
+	assert(!res);
+	res = m.erase(20);
+	assert(res == 1);
+	res = m.erase(40);
+	assert(res == 1);
+	res = m.erase(10);
+	assert(res == 1);
+	res = m.erase(60);
+	assert(res == 1);
+	assert(m.empty() == true);
+	std::cout << "\nERASE TESTS: OK\n";
 	return ;
 }
 
@@ -43,6 +102,7 @@ int	main(void)
 {
 	construction();
 	insertion();
+	erase();
 	access();
 	std::cout << std::endl;
 	return (0);
