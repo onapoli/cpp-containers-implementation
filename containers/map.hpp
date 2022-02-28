@@ -8,6 +8,7 @@
 #include <iostream> // FOR TESTING
 
 # include "../utility/utility.hpp"
+# include "../type_traits/type_traits.hpp"
 # include "map_iter.hpp"
 # include "TreeNode.hpp"
 
@@ -55,7 +56,13 @@ namespace	ft
 		//Member functions
 		explicit map(key_compare const & comp = key_compare(),
 			allocator_type const & alloc = allocator_type());
-		/*range constructor*/
+		//range constructor
+		template <class InputIterator>
+		map (InputIterator first, InputIterator last,
+       		key_compare const & comp = key_compare(),
+			allocator_type const & alloc = allocator_type(),
+			typename ft::enable_if< ft::is_integral<InputIterator>::value
+			== false >::type * = 0);
 		map(map const & src);
 		~map(void);
 
@@ -145,7 +152,25 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
+	template <class InputIterator>
+	map<Key, T, Compare, Alloc>::map(InputIterator first, InputIterator last,
+       	key_compare const & comp, allocator_type const & alloc,
+		typename ft::enable_if< ft::is_integral<InputIterator>::value
+		== false >::type *) : _alloc(alloc), _comp(comp), _root(0), _size(0)
+	{
+		iterator	it;
+
+		for (it = first; it != last; ++it)
+		{
+			this->insert(*it);
+			++this->_size;
+		}
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
 	map<Key, T, Compare, Alloc>::map(map const & src)
+		: _alloc(allocator_type()), _comp(key_compare()), _root(0), _size(0)
 	{
 		*this = src;
 		return ;
