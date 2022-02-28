@@ -31,7 +31,7 @@ namespace	ft
 		TreeNode *		getLeft(void) const;
 		TreeNode *		getRight(void) const;
 		void			setRed(bool red);
-		void			setValue(value_type const & val);
+		void			setValue(value_type * val);
 		void			setParent(TreeNode * parent);
 		void			setLeft(TreeNode * left);
 		void			setRight(TreeNode * right);
@@ -129,7 +129,7 @@ namespace	ft
 	}
 
 	template< typename Key, typename T >
-	void	TreeNode< Key, T >::setValue(value_type const & val)
+	void	TreeNode< Key, T >::setValue(value_type * val)
 	{
 		this->_val = val;
 		return ;
