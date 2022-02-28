@@ -98,12 +98,29 @@ void	access(void)
 	return ;
 }
 
+void	observers(void)
+{
+	ft::map<int, std::string>				m;
+	ft::map<int, std::string>::iterator		it;
+	ft::map<int, std::string>::key_compare	cmp;
+
+	m.insert(ft::pair<int, std::string>(1, "a"));
+	m.insert(ft::pair<int, std::string>(2, "b"));
+	cmp = m.key_comp();
+	it = m.end();
+	--it;
+	assert(cmp(m.begin()->first, it->first));
+	std::cout << "\nOBSERVERS TESTS: OK\n";
+	return ;
+}
+
 int	main(void)
 {
 	construction();
 	insertion();
 	erase();
 	access();
+	observers();
 	std::cout << std::endl;
 	return (0);
 }
