@@ -3,8 +3,12 @@
 
 # include <memory>
 # include <functional>
+# include <cstddef>
+
+#include <iostream> // FOR TESTING
 
 # include "../utility/utility.hpp"
+# include "map_iter.hpp"
 # include "TreeNode.hpp"
 
 namespace	ft
@@ -27,7 +31,7 @@ namespace	ft
 		typedef typename allocator_type::const_reference	const_reference;
 		typedef	typename allocator_type::pointer			pointer;
 		typedef	typename allocator_type::const_pointer		const_pointer;
-		//typedef	/*map_iterator*/						iterator;
+		typedef	map_iter<Key, T, Compare, Alloc>			iterator;
 		//...
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
@@ -41,6 +45,12 @@ namespace	ft
 
 		map &			operator=(map const & rhs);
 
+		//Iterators
+		iterator		begin(void);
+		//const_iterator	begin()	const;
+		iterator		end(void);
+		//const_iterator	end()	const;
+	
 		//Capacity
 		bool			empty(void) const;
 		size_type		size(void) const;
@@ -50,21 +60,59 @@ namespace	ft
 		mapped_type		operator[](key_type const & k);
 
 		//Modifiers
-		bool			insert(value_type const & val);
+		/*ft::pair<iterator,bool>*/bool			insert(value_type const & val); //provisional hasta implementar iterators
+		//iterator		insert(iterator position, value_type const & val);
+		//template <class InputIterator>
+		//void	insert(InputIterator first, InputIterator last);
+		//void 			erase (iterator position);
+		size_type		erase(key_type const & k);
+		//void			erase(iterator first, iterator second);
+
+		//test
+		void			printRoot() const;
+		void			printTree() const;
 
 	private:
 
+		typedef struct	_s_node_fam
+		{
+			TreeNode<Key, T> *	parent;
+			TreeNode<Key, T> *	sibling;
+			TreeNode<Key, T> *	gParent;
+			TreeNode<Key, T> *	uncle;
+		}				_t_node_fam;
+		
 		allocator_type		_alloc;
 		key_compare			_comp;
 		TreeNode<Key, T> *	_root;
 		size_type			_size;
 
-		value_type *	_persist_val(value_type const & val);
-		bool			_insertNode(TreeNode<Key, T> * node,
-							value_type const & val);
-		void			_delete_tree(TreeNode<Key, T> * node);
-		mapped_type		_search(TreeNode<Key, T> * node,
-							key_type const & k);
+		value_type *		_persist_val(value_type const & val);
+		//Rebalancing functions
+		void				_init_fam(TreeNode<Key, T> * node,
+								_t_node_fam & fam);
+		void				_left_rotate(TreeNode<Key, T> * node);
+		void				_right_rotate(TreeNode<Key, T> * node);
+		//rebalancing cases
+		void				_left_left(TreeNode<Key, T> * target);
+		void				_left_right(TreeNode<Key, T> * target);
+		void				_right_right(TreeNode<Key, T> * target);
+		void				_right_left(TreeNode<Key, T> * target);
+		//insertion and insertion rebalancing functions
+		void				_balance_insert(TreeNode<Key, T> * target);
+		bool				_insert_node(TreeNode<Key, T> * node,
+								value_type const & val);
+		//erase and erase rebalancing functions
+		void				_balance_erase(TreeNode<Key, T> * node);
+		TreeNode<Key, T> *	_get_substitute(TreeNode<Key, T> * node);
+		void				_delete_node(TreeNode<Key, T> * node);
+		//function for deleting the entire tree
+		void				_delete_tree(TreeNode<Key, T> * node);
+		//utility function
+		TreeNode<Key, T> *	_search(key_type const & k);
+		//test function
+		void				_printTree(TreeNode<Key, T> * node,
+								int space) const;
 	
 	};
 
@@ -106,6 +154,35 @@ namespace	ft
 		return (*this);
 	}
 
+	//Iterators
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::begin(void)
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_root;
+		while (node->getLeft())
+			node = node->getLeft();
+		return (iterator(node));
+	}
+
+	//Iterators
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::end(void)
+	{
+		TreeNode<Key, T> *	node;
+		iterator			it;
+
+		node = this->_root;
+		while (node->getRight())
+			node = node->getRight();
+		it = iterator(node);
+		++it;
+		return (it);
+	}
+
 	//Capacity
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -138,7 +215,12 @@ namespace	ft
 		**	WHEN ITERATOR IS IMPLEMENTED
 		**	return ((*((this->insert(ft::make_pair(k, mapped_type()))).first)).second);
 		*/
-		return (this->_search(this->_root, k));
+		TreeNode<Key, T> *	node;
+
+		node = this->_search(k);
+		if (!node)
+			return (mapped_type());
+		return (node->getValue().second);
 	}
 
 	//Modifiers
@@ -155,13 +237,43 @@ namespace	ft
 				this->_persist_val(val), 0, 0);
 		}
 		else
-			res = this->_insertNode(this->_root, val);
+			res = this->_insert_node(this->_root, val);
 		if (res)
-		{
-			//Call this->_balanceTree();
 			this->_size += 1;
-		}
 		return (res);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::size_type
+		map<Key, T, Compare, Alloc>::erase(key_type const & k)
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_search(k);
+		if (!node)
+			return (0);
+		this->_delete_node(node);
+		this->_size -= 1;
+		return (1);
+	}
+
+	//test
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::printRoot(void) const
+	{
+		std::cout << "root: " << this->_root->getValue().first << std::endl;
+		if (this->_root->getParent())
+			std::cout << "parent: " << this->_root->getParent()->getValue().first << std::endl;
+		std::cout << "root color: " << this->_root->isRed() << std::endl;
+		return ;
+	}
+
+	//test
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::printTree(void) const
+	{
+		this->_printTree(this->_root, 0);
+		return ;
 	}
 
 	//Private member functions
@@ -178,7 +290,234 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	bool	map<Key, T, Compare, Alloc>::_insertNode(TreeNode<Key, T> * node,
+	void	map<Key, T, Compare, Alloc>::_init_fam(TreeNode<Key, T> * node,
+				_t_node_fam & fam)
+	{
+		fam.parent = node->getParent();
+		fam.sibling = 0;
+		fam.gParent = 0;
+		fam.uncle = 0;
+		if (!fam.parent)
+			return ;
+		fam.sibling = (fam.parent)->getLeft() != node ?
+			(fam.parent)->getLeft() : (fam.parent)->getRight();
+		fam.gParent = (fam.parent)->getParent();
+		if (!fam.gParent)
+			return ;
+		fam.uncle = (fam.gParent)->getLeft() != fam.parent ?
+			(fam.gParent)->getLeft() : (fam.gParent)->getRight();
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::_left_rotate(TreeNode<Key, T> * node)
+	{
+		TreeNode<Key, T> *	parent;
+		TreeNode<Key, T> *	right_child;
+
+		parent = node->getParent();
+		right_child = node->getRight();
+		right_child->setParent(parent);
+		//update the pointer of node parent
+		if (parent)
+		{
+			parent->getRight() == node ? parent->setRight(right_child)
+				: parent->setLeft(right_child);
+		} 
+		node->setParent(right_child);
+		node->setRight(right_child->getLeft());
+		right_child->setLeft(node);
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::_right_rotate(TreeNode<Key, T> * node)
+	{
+		TreeNode<Key, T> * parent;
+		TreeNode<Key, T> * left_child;
+
+		parent = node->getParent();
+		left_child = node->getLeft();
+		left_child->setParent(parent);
+		//update the pointer of node parent
+		if (parent)
+		{
+			parent->getRight() == node ? parent->setRight(left_child)
+				: parent->setLeft(left_child);
+		}
+		node->setParent(left_child);
+		node->setLeft(left_child->getRight());
+		left_child->setRight(node);
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void
+		map<Key, T, Compare, Alloc>::_left_left(TreeNode<Key, T> * target)
+	{
+		/*
+		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
+		**	BECAUSE THE COLOR OF UNCLE WAS CHECKED.
+		**
+		**	1. Right rotate grandParent of target.
+		**	2. Set color of parent of target to black.
+		**	3. Set color of what was previously grandParent of target,
+		**		which now is rightChild of parent of target, to red.
+		**	4. If parent of target does not have a parent, this means
+		**		that the node that at the beginning was the grandParent
+		**		of target was the root of the tree. So we change the
+		**		root pointer to the current parent of target.
+		*/
+		this->_right_rotate(target->getParent()->getParent());
+		if (target->getParent()->isRed())
+			target->getParent()->setRed(false);
+		else
+			target->getParent()->setRed(true);
+		if (target->getParent()->getRight()->isRed())
+			target->getParent()->getRight()->setRed(false);
+		else
+			target->getParent()->getRight()->setRed(true);
+		if (!target->getParent()->getParent())
+			this->_root = target->getParent();
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void
+		map<Key, T, Compare, Alloc>::_left_right(TreeNode<Key, T> * target)
+	{
+		/*
+		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
+		**	BECAUSE THE COLOR OF UNCLE WAS CHECKED.
+		**
+		**	1. Left rotate Parent of target.
+		**	2. Right rotate the new Parent of target, which is the previous
+		**		grandParent of target.
+		**	3. Set color of target to black.
+		**	4. Set color of what at the beginning was grandParent of target,
+		**		which now is rightChild of target, to red.
+		**	5. If target does not have a parent, this means that the previous
+		**		grandParent of target was thee root node. So we change the
+		**		root pointer to target.
+		*/
+		this->_left_rotate(target->getParent());
+		this->_right_rotate(target->getParent());
+		if (target->isRed())
+			target->setRed(false);
+		else
+			target->setRed(true);
+		if (target->getRight()->isRed())
+			target->getRight()->setRed(false);
+		else
+			target->getRight()->setRed(true);
+		if (!target->getParent())
+			this->_root = target;
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void
+		map<Key, T, Compare, Alloc>::_right_right(TreeNode<Key, T> * target)
+	{
+		/*
+		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
+		**	BECAUSE THE COLOR OF UNCLE WAS CHECKED.
+		**
+		**	1. Left rotate grandParent of target.
+		**	2. Set color of parent of target to black.
+		**	3. Set color of what was previously grandParent of target,
+		**		which now is leftChild of parent of target, to red.
+		**	4. If parent of target does not have a parent, this means
+		**		that the node that at the beginning was the grandParent
+		**		of target was the root of the tree. So we change the
+		**		root pointer to the current parent of target.
+		*/
+		this->_left_rotate(target->getParent()->getParent());
+		if (target->getParent()->isRed())
+			target->getParent()->setRed(false);
+		else
+			target->getParent()->setRed(true);
+		if (target->getParent()->getLeft()->isRed())
+			target->getParent()->getLeft()->setRed(false);
+		else
+			target->getParent()->getLeft()->setRed(true);
+		if (!target->getParent()->getParent())
+			this->_root = target->getParent();
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void
+		map<Key, T, Compare, Alloc>::_right_left(TreeNode<Key, T> * target)
+	{
+		/*
+		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
+		**	BECAUSE THE COLOR OF UNCLE WAS CHECKED.
+		**
+		**	1. Right rotate Parent of target.
+		**	2. Left rotate the new Parent of target, which is the previous
+		**		grandParent of target.
+		**	3. Set color of target to black.
+		**	4. Set color of what at the beginning was grandParent of target,
+		**		which now is leftChild of target, to red.
+		**	5. If target does not have a parent, this means that the previous
+		**		grandParent of target was thee root node. So we change the
+		**		root pointer to target.
+		*/
+		this->_right_rotate(target->getParent());
+		this->_left_rotate(target->getParent());
+		if (target->isRed())
+			target->setRed(false);
+		else
+			target->setRed(true);
+		if (target->getLeft()->isRed())
+			target->getLeft()->setRed(false);
+		else
+			target->getLeft()->setRed(true);
+		if (!target->getParent())
+			this->_root = target;
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void
+		map<Key, T, Compare, Alloc>::_balance_insert(TreeNode<Key, T> * target)
+	{
+		_t_node_fam	fam;
+
+		this->_init_fam(target, fam);
+		while (fam.parent && (fam.parent)->isRed())
+		{
+			if (fam.uncle && (fam.uncle)->isRed())
+			{
+				(fam.parent)->setRed(false);
+				(fam.uncle)->setRed(false);
+				if ((fam.gParent)->getParent())
+					(fam.gParent)->setRed(true);
+				target = fam.gParent;
+				this->_init_fam(target, fam);
+			}
+			else
+			{
+				if (fam.parent == (fam.gParent)->getLeft() &&
+					target == (fam.parent)->getLeft())
+					this->_left_left(target);
+				else if (fam.parent == (fam.gParent)->getLeft() &&
+					target == (fam.parent)->getRight())
+					this->_left_right(target);
+				else if (fam.parent == (fam.gParent)->getRight() &&
+					target == (fam.parent)->getRight())
+					this->_right_right(target);
+				else
+					this->_right_left(target);
+				break ;
+			}
+		}
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	bool	map<Key, T, Compare, Alloc>::_insert_node(TreeNode<Key, T> * node,
 				value_type const & val)
 	{
 		if (this->_comp(val.first, node->getValue().first))
@@ -187,9 +526,10 @@ namespace	ft
 			{
 				node->setLeft(new TreeNode<Key, T>(true, node,
 					this->_persist_val(val), 0, 0));
+				this->_balance_insert(node->getLeft());
 				return (true);
 			}
-			return (this->_insertNode(node->getLeft(), val));
+			return (this->_insert_node(node->getLeft(), val));
 		}
 		if (this->_comp(node->getValue().first, val.first))
 		{
@@ -197,11 +537,177 @@ namespace	ft
 			{
 				node->setRight(new TreeNode<Key, T>(true, node,
 					this->_persist_val(val), 0, 0));
+				this->_balance_insert(node->getRight());
 				return (true);
 			}
-			return (this->_insertNode(node->getRight(), val));
+			return (this->_insert_node(node->getRight(), val));
 		}
 		return (false);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::_balance_erase(TreeNode<Key, T> * node)
+	{
+		_t_node_fam	fam;
+
+		this->_init_fam(node, fam);
+		if (node->isRed() || this->_root == node)
+		{
+			node->setRed(false);
+			return ;
+		}
+		if (!fam.sibling)
+			this->_balance_erase(fam.parent);
+		else
+		{
+			if ((fam.sibling)->isRed())
+			{
+				(fam.parent)->setRed(true);
+				(fam.sibling)->setRed(false);
+				if (fam.sibling == (fam.parent)->getLeft())
+					this->_right_rotate(fam.parent);
+				else
+					this->_left_rotate(fam.parent);
+				this->_balance_erase(node);
+			}
+			else
+			{
+				if (((fam.sibling)->getLeft() && (fam.sibling)->getLeft()->isRed())
+					|| ((fam.sibling)->getRight() && (fam.sibling)->getRight()->isRed()))
+				{
+					if ((fam.parent)->getLeft() == fam.sibling)
+					{
+						if ((fam.sibling)->getLeft()
+							&& (fam.sibling)->getLeft()->isRed())
+						{
+							(fam.sibling)->getLeft()->setRed(false);
+							this->_left_left((fam.sibling)->getLeft());
+						}
+						else
+						{
+							(fam.sibling)->getRight()->setRed(false);
+							this->_left_right((fam.sibling)->getRight());
+						}
+					}
+					else
+					{
+						if ((fam.sibling)->getRight()
+							&& (fam.sibling)->getRight()->isRed())
+						{
+							(fam.sibling)->getRight()->setRed(false);
+							this->_right_right((fam.sibling)->getRight());
+						}
+						else
+						{
+							(fam.sibling)->getLeft()->setRed(false);
+							this->_right_left((fam.sibling)->getLeft());
+						}
+					}
+				}
+				else
+				{
+					(fam.sibling)->setRed(true);
+					if ((fam.parent)->isRed())
+						(fam.parent)->setRed(false);
+					else
+						this->_balance_erase(fam.parent);
+				}
+			}
+		}
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	TreeNode<Key, T> *
+		map<Key, T, Compare, Alloc>::_get_substitute(TreeNode<Key, T> * node)
+	{
+		TreeNode<Key, T> *	substitute;
+
+		substitute = 0;
+		/*
+		**	Substitute of node to be erased will be the leftmost
+		**	node of right node when node to be erased has two non NULL
+		**	childs.
+		*/
+		if (node->getLeft() && node->getRight())
+		{
+			substitute = node->getRight();
+			while (substitute->getLeft())
+				substitute = substitute->getLeft();
+		}
+		else if (node->getLeft())
+			substitute = node->getLeft();
+		else if (node->getRight())
+			substitute = node->getRight();
+		return (substitute);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::_delete_node(TreeNode<Key, T> * node)
+	{
+		_t_node_fam			node_fam;
+		TreeNode<Key, T> *	substitute;
+	
+		this->_init_fam(node, node_fam);
+		substitute = this->_get_substitute(node);
+		if (!substitute)
+		{
+			if (node_fam.parent)
+			{
+				/*
+				**	First rebalance using node to get t_node_fam, if passing 0
+				**	that data would not be available.
+				*/
+				this->_balance_erase(node);
+				//	Then assign null to parent pointer to node.
+				(node_fam.parent)->getLeft() == node
+					? (node_fam.parent)->setLeft(0)
+					: (node_fam.parent)->setRight(0);
+			}
+			else
+				this->_root = 0;
+			this->_alloc.destroy(&node->getValue());
+			this->_alloc.deallocate(&node->getValue(), 1);
+			delete node;
+			return ;
+		}
+		else if (!node->getLeft() || !node->getRight())
+		{
+			if (node_fam.parent)
+			{
+				(node_fam.parent)->getLeft() == node
+					? (node_fam.parent)->setLeft(substitute)
+					: (node_fam.parent)->setRight(substitute);
+				substitute->setParent(node_fam.parent);
+			}
+			else
+			{
+				/*
+				**	node is root, so substitute didn't have sibling,
+				**	uncle and gParent already.
+				*/
+				substitute->setParent(0);
+				this->_root = substitute;
+			}
+			if (!node->isRed())
+				this->_balance_erase(substitute);
+			else
+				substitute->setRed(false);
+			this->_alloc.destroy(&node->getValue());
+			this->_alloc.deallocate(&node->getValue(), 1);
+			delete node;
+			return ;
+		}
+		/*
+		**	Set value of node to that of substitute and call _delete_node again,
+		**	but this time on substitute, so that deallocation and detachment
+		**	happens on a leaf node and not on an internal node.
+		*/
+		this->_alloc.destroy(&node->getValue());
+		this->_alloc.deallocate(&node->getValue(), 1);
+		node->setValue(this->_persist_val(substitute->getValue()));
+		this->_delete_node(substitute);
+		return ;
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -220,33 +726,48 @@ namespace	ft
 		this->_alloc.destroy(&node->getValue());
 		this->_alloc.deallocate(&node->getValue(), 1);
 		delete node;
+		this->_size -= 1;
 		return ;
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::mapped_type
-		map<Key, T, Compare, Alloc>::_search(TreeNode<Key, T> * node,
-		key_type const & k)
+	TreeNode< Key, T > *
+		map<Key, T, Compare, Alloc>::_search(key_type const & k)
 	{
-		//THIS FUNCTION IS PROVISIONAL. IT IS UNNECESSARY.
-		value_type *	node_val;
+		TreeNode<Key, T> *	node;
+		value_type *		node_val;
 
-		node_val = &(node->getValue());
-		if (node_val->first == k)
-			return (node_val->second);
-		if (this->_comp(k, node_val->first))
+		node = this->_root;
+		while (node)
 		{
-			if (!node->getLeft())
-				return (mapped_type());
-			return (this->_search(node->getLeft(), k));
+			node_val = &(node->getValue());
+			if (node_val->first == k)
+				break ;
+			if (this->_comp(k, node_val->first))
+				node = node->getLeft();
+			else
+				node = node->getRight();
 		}
-		else
-		{
-			if (!node->getRight())
-				return (mapped_type());
-			return (this->_search(node->getRight(), k));
-		}
+		return (node);
 	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::_printTree(TreeNode<Key, T> * node,
+				int space) const
+    {
+        int	i;
+	
+        if (node)
+        {
+            space += 10;
+            this->_printTree(node->getRight(), space);
+            std::cout << "\n";
+            for (i = 10; i < space; ++i)
+                std::cout << " ";
+            std::cout << node->getValue().first << std::endl;
+            this->_printTree(node->getLeft(), space);
+        }
+    }
 
 }
 
