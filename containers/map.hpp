@@ -49,7 +49,7 @@ namespace	ft
 		typedef	typename allocator_type::pointer			pointer;
 		typedef	typename allocator_type::const_pointer		const_pointer;
 		typedef	map_iter<Key, T, Compare, Alloc>			iterator;
-		//...
+		typedef	map_iter<Key, T const, Compare, Alloc>		const_iterator;
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
 
@@ -66,36 +66,51 @@ namespace	ft
 		map(map const & src);
 		~map(void);
 
-		map &			operator=(map const & rhs);
+		map &						operator=(map const & rhs);
 
 		//Iterators
-		iterator		begin(void);
-		//const_iterator	begin()	const;
-		iterator		end(void);
-		//const_iterator	end()	const;
+		iterator					begin(void);
+		const_iterator				begin(void)	const;
+		iterator					end(void);
+		const_iterator				end(void) const;
 	
 		//Capacity
-		bool			empty(void) const;
-		size_type		size(void) const;
-		size_type		max_size(void) const;
+		bool						empty(void) const;
+		size_type					size(void) const;
+		size_type					max_size(void) const;
 
 		//Element access
-		mapped_type		operator[](key_type const & k);
+		mapped_type	&				operator[](key_type const & k);
 
 		//Modifiers
-		/*ft::pair<iterator,bool>*/bool			insert(value_type const & val); //provisional hasta implementar iterators
-		//iterator		insert(iterator position, value_type const & val);
+		ft::pair<iterator, bool>	insert(value_type const & val);
+		iterator					insert(iterator position,
+										value_type const & val);
 		//template <class InputIterator>
 		//void	insert(InputIterator first, InputIterator last);
 		//void 			erase (iterator position);
-		size_type		erase(key_type const & k);
+		size_type					erase(key_type const & k);
 		//void			erase(iterator first, iterator second);
+		void						swap(map & x);
 
 		//Observers
-		key_compare		key_comp(void) const;
+		key_compare					key_comp(void) const;
+
+		//Operations
+		iterator					find(key_type const & k);
+		const_iterator				find(key_type const & k) const;
+		size_type					count(key_type const & k) const;
+		iterator					lower_bound(key_type const & k);
+		const_iterator				lower_bound(key_type const & k) const;
+		iterator					upper_bound(key_type const & k);
+		const_iterator 				upper_bound(key_type const & k) const;
+		ft::pair<const_iterator,const_iterator>
+			equal_range(key_type const & k) const;
+		ft::pair<iterator,iterator>	equal_range(key_type const & k);
+
 		//test
-		void			printRoot() const;
-		void			printTree() const;
+		void						printRoot() const;
+		void						printTree() const;
 
 	private:
 
@@ -112,32 +127,32 @@ namespace	ft
 		TreeNode<Key, T> *	_root;
 		size_type			_size;
 
-		value_type *		_persist_val(value_type const & val);
+		value_type *				_persist_val(value_type const & val);
 		//Rebalancing functions
-		void				_init_fam(TreeNode<Key, T> * node,
-								_t_node_fam & fam);
-		void				_left_rotate(TreeNode<Key, T> * node);
-		void				_right_rotate(TreeNode<Key, T> * node);
+		void						_init_fam(TreeNode<Key, T> * node,
+										_t_node_fam & fam);
+		void						_left_rotate(TreeNode<Key, T> * node);
+		void						_right_rotate(TreeNode<Key, T> * node);
 		//rebalancing cases
-		void				_left_left(TreeNode<Key, T> * target);
-		void				_left_right(TreeNode<Key, T> * target);
-		void				_right_right(TreeNode<Key, T> * target);
-		void				_right_left(TreeNode<Key, T> * target);
+		void						_left_left(TreeNode<Key, T> * target);
+		void						_left_right(TreeNode<Key, T> * target);
+		void						_right_right(TreeNode<Key, T> * target);
+		void						_right_left(TreeNode<Key, T> * target);
 		//insertion and insertion rebalancing functions
-		void				_balance_insert(TreeNode<Key, T> * target);
-		bool				_insert_node(TreeNode<Key, T> * node,
-								value_type const & val);
+		void						_balance_insert(TreeNode<Key, T> * target);
+		ft::pair<iterator, bool>	_insert_node(TreeNode<Key, T> * node,
+										value_type const & val);
 		//erase and erase rebalancing functions
-		void				_balance_erase(TreeNode<Key, T> * node);
-		TreeNode<Key, T> *	_get_substitute(TreeNode<Key, T> * node);
-		void				_delete_node(TreeNode<Key, T> * node);
+		void						_balance_erase(TreeNode<Key, T> * node);
+		TreeNode<Key, T> *			_get_substitute(TreeNode<Key, T> * node);
+		void						_delete_node(TreeNode<Key, T> * node);
 		//function for deleting the entire tree
-		void				_delete_tree(TreeNode<Key, T> * node);
+		void						_delete_tree(TreeNode<Key, T> * node);
 		//utility function
-		TreeNode<Key, T> *	_search(key_type const & k);
+		TreeNode<Key, T> *			_search(key_type const & k) const;
 		//test function
-		void				_printTree(TreeNode<Key, T> * node,
-								int space) const;
+		void						_printTree(TreeNode<Key, T> * node,
+										int space) const;
 	
 	};
 
@@ -198,6 +213,7 @@ namespace	ft
 	}
 
 	//Iterators
+
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::begin(void)
@@ -210,7 +226,18 @@ namespace	ft
 		return (iterator(node));
 	}
 
-	//Iterators
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_iterator
+		map<Key, T, Compare, Alloc>::begin(void) const
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_root;
+		while (node->getLeft())
+			node = node->getLeft();
+		return (const_iterator(node));
+	}
+
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::end(void)
@@ -222,6 +249,21 @@ namespace	ft
 		while (node->getRight())
 			node = node->getRight();
 		it = iterator(node);
+		++it;
+		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_iterator
+		map<Key, T, Compare, Alloc>::end(void) const
+	{
+		TreeNode<Key, T> *	node;
+		iterator			it;
+
+		node = this->_root;
+		while (node->getRight())
+			node = node->getRight();
+		it = const_iterator(node);
 		++it;
 		return (it);
 	}
@@ -251,40 +293,53 @@ namespace	ft
 	//Element Access
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::mapped_type
+	typename map<Key, T, Compare, Alloc>::mapped_type &
 		map<Key, T, Compare, Alloc>::operator[](key_type const & k)
 	{
-		/*
-		**	WHEN ITERATOR IS IMPLEMENTED
-		**	return ((*((this->insert(ft::make_pair(k, mapped_type()))).first)).second);
-		*/
-		TreeNode<Key, T> *	node;
-
-		node = this->_search(k);
-		if (!node)
-			return (mapped_type());
-		return (node->getValue().second);
+		return ((*((this->insert(ft::make_pair(k,
+			mapped_type()))).first)).second);
 	}
 
 	//Modifiers
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	bool	map<Key, T, Compare, Alloc>::insert(value_type const & val)
+	ft::pair<typename map<Key, T, Compare, Alloc>::iterator, bool>
+		map<Key, T, Compare, Alloc>::insert(value_type const & val)
 	{
-		bool		res;
+		ft::pair<iterator, bool>	res;
 
-		res = true;
 		if (!this->_root)
 		{
 			this->_root = new TreeNode<Key, T>(false, 0,
 				this->_persist_val(val), 0, 0);
+			res = ft::make_pair<iterator, bool>(iterator(this->_root), true);
 		}
 		else
 			res = this->_insert_node(this->_root, val);
-		if (res)
+		if (res.second)
 			this->_size += 1;
 		return (res);
 	}
+
+	/*template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::insert(iterator position,
+			value_type const & val)
+	{
+		ft::pair<iterator, bool>	pr;
+
+		if (!this->_root)
+		{
+			this->_root = new TreeNode<Key, T>(false, 0,
+				this->_persist_val(val), 0, 0);
+			return (iterator(this->_root));
+		}
+		if ()
+		{}
+		else
+			pr = this->_insert_node(this->_root, val);
+		return (pr.first);
+	}*/
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	typename map<Key, T, Compare, Alloc>::size_type
@@ -300,6 +355,28 @@ namespace	ft
 		return (1);
 	}
 
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::swap(map & x)
+	{
+		size_type			aux_size;
+		TreeNode<Key, T> *	aux_root;
+
+		/*
+		**	I DECIDED TO KEEP _alloc AND _comp WHERE THEY WERE ORIGINALLY
+		**	ASSIGNED.
+		*/
+		if (this != &x)
+		{
+			aux_size = this->_size;
+			aux_root = this->_root;
+			this->_size = x._size;
+			this->_root = x._root;
+			x._size = aux_size;
+			x._root = aux_root;
+		}
+		return ;
+	}
+
 	//Observers
 	
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -307,6 +384,135 @@ namespace	ft
 		map<Key, T, Compare, Alloc>::key_comp(void) const
 	{
 		return (this->_comp);
+	}
+
+	//Operations
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::find(key_type const & k)
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_search(k);
+		if (node)
+			return (iterator(node));
+		return (this->end());
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_iterator
+		map<Key, T, Compare, Alloc>::find(key_type const & k) const
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_search(k);
+		if (node)
+			return (const_iterator(node));
+		return (this->end());
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::size_type
+		map<Key, T, Compare, Alloc>::count(key_type const & k) const
+	{
+		TreeNode<Key, T> *	node;
+
+		node = this->_search(k);
+		if (node)
+			return (1);
+		return (0);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k)
+	{
+		TreeNode<Key, T> *	node;
+		iterator			it;
+
+		node = this->_root;
+		while (k != node->getValue().first)
+		{
+			if (this->_comp(k, node->getValue().first))
+			{
+				if (node->getLeft()
+					&& (this->_comp(k, node->getLeft()->getValue().first)
+					|| k == node->getLeft()->getValue().first))
+					node = node->getLeft();
+				else
+					break ;
+			}
+			else
+			{
+				if (node->getRight())
+					node = node->getRight();
+				else
+					break ;
+			}
+		}
+		it = iterator(node);
+		if (this->_comp(node->getValue().first, k)) //SENDS this->end()
+			++it;
+		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_iterator
+		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k) const
+	{
+		//NEED CONVERSION FROM iterator TO const_iterator
+		const_iterator	it;
+
+		it = this->lower_bound(k);
+		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::iterator
+		map<Key, T, Compare, Alloc>::upper_bound(key_type const & k)
+	{
+		iterator	it;
+
+		it = this->lower_bound(k);
+		if (it != this->end() && it->first <= k)
+			++it;
+		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_iterator
+		map<Key, T, Compare, Alloc>::upper_bound(key_type const & k) const
+	{
+		//NEED CONVERSION FROM iterator TO const_iterator
+		const_iterator	it;
+
+		it = this->upper_bound(k);
+		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	ft::pair<typename map<Key, T, Compare, Alloc>::iterator,
+		typename map<Key, T, Compare, Alloc>::iterator>
+		map<Key, T, Compare, Alloc>::equal_range(key_type const & k)
+	{
+		ft::pair<iterator, iterator>	pr;
+
+		pr.first = this->lower_bound(k);
+		pr.second = this->upper_bound(k);
+		return (pr);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	ft::pair<typename map<Key, T, Compare, Alloc>::const_iterator,
+		typename map<Key, T, Compare, Alloc>::const_iterator>
+		map<Key, T, Compare, Alloc>::equal_range(key_type const & k) const
+	{
+		ft::pair<const_iterator, const_iterator>	pr;
+
+		pr.first = this->lower_bound(k);
+		pr.second = this->upper_bound(k);
+		return (pr);
 	}
 
 	//test
@@ -569,8 +775,9 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	bool	map<Key, T, Compare, Alloc>::_insert_node(TreeNode<Key, T> * node,
-				value_type const & val)
+	ft::pair<typename map<Key, T, Compare, Alloc>::iterator, bool>
+		map<Key, T, Compare, Alloc>::_insert_node(TreeNode<Key, T> * node,
+			value_type const & val)
 	{
 		if (this->_comp(val.first, node->getValue().first))
 		{
@@ -579,7 +786,8 @@ namespace	ft
 				node->setLeft(new TreeNode<Key, T>(true, node,
 					this->_persist_val(val), 0, 0));
 				this->_balance_insert(node->getLeft());
-				return (true);
+				return (ft::make_pair<iterator,
+					bool>(iterator(node->getLeft()), true));
 			}
 			return (this->_insert_node(node->getLeft(), val));
 		}
@@ -590,11 +798,12 @@ namespace	ft
 				node->setRight(new TreeNode<Key, T>(true, node,
 					this->_persist_val(val), 0, 0));
 				this->_balance_insert(node->getRight());
-				return (true);
+				return (ft::make_pair<iterator,
+					bool>(iterator(node->getRight()), true));
 			}
 			return (this->_insert_node(node->getRight(), val));
 		}
-		return (false);
+		return (ft::make_pair<iterator, bool>(iterator(node), false));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -784,7 +993,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	TreeNode< Key, T > *
-		map<Key, T, Compare, Alloc>::_search(key_type const & k)
+		map<Key, T, Compare, Alloc>::_search(key_type const & k) const
 	{
 		TreeNode<Key, T> *	node;
 		value_type *		node_val;

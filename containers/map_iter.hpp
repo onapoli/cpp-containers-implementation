@@ -45,6 +45,8 @@ namespace	ft
 		map_iter	operator++(int);
 		map_iter &	operator--(void);
 		map_iter	operator--(int);
+
+		node *		getNode(void) const;
 	
 	private:
 	
@@ -228,6 +230,13 @@ namespace	ft
 
 		--(*this);
 		return (m);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map_iter<Key, T, Compare, Alloc>::node *
+		map_iter<Key, T, Compare, Alloc>::getNode(void) const
+	{
+		return (this->_node);
 	}
 	
 }
