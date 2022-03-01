@@ -5,13 +5,15 @@
 
 void	construction(void)
 {
-	ft::map<int, std::string>			m;
-	ft::map<int, std::string>::iterator	it;
+	ft::map<int, std::string>							m;
+	ft::map<int, std::string>::iterator					it;
+	ft::pair<ft::map<int, std::string>::iterator, bool>	pr;
 
 	m.insert(ft::make_pair<int, std::string>(5, "hello"));
 	assert(!m.empty());
 	assert(m.size() == 1);
-	assert(m.insert(ft::make_pair<int, std::string>(5, "hello")) == false);
+	pr = m.insert(ft::make_pair<int, std::string>(5, "hello"));
+	assert(pr.second == false);
 	assert(m.size() == 1);
 	m.insert(ft::make_pair<int, std::string>(1, "bye"));
 	assert(m.size() == 2);
@@ -90,6 +92,23 @@ void	erase(void)
 	return ;
 }
 
+void	swapping(void)
+{
+	ft::map<int, std::string>	m;
+	ft::map<int, std::string>	n;
+
+	m.insert(ft::make_pair<int, std::string>(5, "hello"));
+	n.insert(ft::make_pair<int, std::string>(10, "bye"));
+	n.insert(ft::make_pair<int, std::string>(15, "au revoir"));
+	m.swap(n);
+	assert(m.size() == 2);
+	assert(n.size() == 1);
+	assert(m.begin()->first == 10 && m.begin()->second == "bye");
+	assert(n.begin()->first == 5 && n.begin()->second == "hello");
+	std::cout << "\nSWAP TESTS: OK\n";
+	return ;
+}
+
 void	access(void)
 {
 	ft::map<int, std::string>	m;
@@ -101,6 +120,9 @@ void	access(void)
 	assert(s == "hello");
 	s = m[1];
 	assert(s == "bye");
+	m[10] = "alo";
+	assert(m.count(10) == 1);
+	assert(m[10] == "alo");
 	std::cout << "\nACCESS TESTS: OK\n";
 	return ;
 }
@@ -121,13 +143,80 @@ void	observers(void)
 	return ;
 }
 
+void	find_count(void)
+{
+	ft::map<int, std::string>				m;
+	ft::map<int, std::string>::iterator		it;
+
+	m.insert(ft::pair<int, std::string>(1, "a"));
+	m.insert(ft::pair<int, std::string>(2, "b"));
+	it = m.find(2);
+	assert(it != m.end());
+	it = m.find(42);
+	assert(it == m.end());
+	assert(m.count(1) == 1);
+	assert(m.count(42) == 0);
+	std::cout << "\nFIND COUNT TESTS: OK\n";
+	return ;
+}
+
+void	bounds(void)
+{
+	ft::map<int, std::string>				m;
+	ft::map<int, std::string>::iterator		it;
+
+	m.insert(ft::pair<int, std::string>(1, "a"));
+	m.insert(ft::pair<int, std::string>(5, "e"));
+	m.insert(ft::pair<int, std::string>(10, "j"));
+	m.insert(ft::pair<int, std::string>(13, "m"));
+	it = m.lower_bound(2);
+	assert(it->first == 5);
+	it = m.lower_bound(10);
+	assert(it->first == 10);
+	it = m.lower_bound(42);
+	assert(it == m.end());
+	it = m.upper_bound(5);
+	assert(it->first == 10);
+	it = m.upper_bound(8);
+	assert(it->first == 10);
+	it = m.upper_bound(15);
+	assert(it == m.end());
+	std::cout << "\nBOUNDS TESTS: OK\n";
+	return ;
+}
+
+void	equal_range(void)
+{
+	ft::map<int, std::string>						m;
+	ft::map<int, std::string>::iterator				it;
+	ft::pair<ft::map<int, std::string>::iterator,
+		ft::map<int, std::string>::iterator>		pr;
+
+	m.insert(ft::pair<int, std::string>(1, "a"));
+	m.insert(ft::pair<int, std::string>(5, "e"));
+	m.insert(ft::pair<int, std::string>(10, "j"));
+	m.insert(ft::pair<int, std::string>(13, "m"));
+	pr = m.equal_range(5);
+	assert((pr.first)->first == 5);
+	assert((pr.second)->first == 10);
+	pr = m.equal_range(42);
+	assert(pr.first == pr.second);
+	assert(pr.first == m.end());
+	std::cout << "\nEQUAL RANGE TESTS: OK\n";
+	return ;
+}
+
 int	main(void)
 {
 	construction();
 	insertion();
 	erase();
+	swapping();
 	access();
 	observers();
+	find_count();
+	bounds();
+	equal_range();
 	std::cout << std::endl;
 	return (0);
 }
