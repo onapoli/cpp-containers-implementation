@@ -26,23 +26,36 @@ namespace	ft
 		typedef	T											mapped_type;
 		typedef	ft::pair< key_type const, mapped_type >		value_type;
 		typedef	Compare										key_compare;
-		/*template <typename Key, typename T, typename Compare, typename Alloc>
-		class map<Key,T,Compare,Alloc>::value_compare : std::binary_function<value_type,value_type,bool>
-		{// in C++98, it is required to inherit binary_function<value_type,value_type,bool>
+
+		/*
+		**	Nested function class for value_compare type.
+		**
+		**	in C++98, it is required to inherit
+		**	binary_function<value_type,value_type,bool>
+		*/
+		class value_compare : std::binary_function<value_type,value_type,bool>
+		{
+
+		private:
+
 			friend class map;
+		
 		protected:
+
 			Compare comp;
-			value_compare(Compare c) : comp(c) {}  // constructed with map's comparison object
+			// constructed with map's comparison object
+			value_compare(Compare c) : comp(c)
+			{}
+		
 		public:
-			//typedef bool result_type;
-			//typedef value_type first_argument_type;
-			//typedef value_type second_argument_type;
 			
-			bool operator() (const value_type& x, const value_type& y) const
+			bool operator()(value_type const & x, value_type const & y) const
 			{
 				return comp(x.first, y.first);
 			}
-		};*/
+		
+		};
+
 		typedef	Alloc										allocator_type;
 		typedef	typename allocator_type::reference			reference;
 		typedef typename allocator_type::const_reference	const_reference;
@@ -97,6 +110,7 @@ namespace	ft
 
 		//Observers
 		key_compare					key_comp(void) const;
+		value_compare				value_comp(void) const;
 
 		//Operations
 		iterator					find(key_type const & k);
@@ -468,6 +482,13 @@ namespace	ft
 		map<Key, T, Compare, Alloc>::key_comp(void) const
 	{
 		return (this->_comp);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::value_compare
+		map<Key, T, Compare, Alloc>::value_comp(void) const
+	{
+		return (value_compare(this->_comp));
 	}
 
 	//Operations
