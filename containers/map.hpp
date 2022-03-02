@@ -88,9 +88,9 @@ namespace	ft
 										value_type const & val);
 		//template <class InputIterator>
 		//void	insert(InputIterator first, InputIterator last);
-		//void 			erase (iterator position);
+		void 						erase(iterator position);
 		size_type					erase(key_type const & k);
-		//void			erase(iterator first, iterator second);
+		void						erase(iterator first, iterator second);
 		void						swap(map & x);
 
 		//Observers
@@ -167,18 +167,17 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	template <class InputIterator>
+	template <typename InputIterator>
 	map<Key, T, Compare, Alloc>::map(InputIterator first, InputIterator last,
        	key_compare const & comp, allocator_type const & alloc,
 		typename ft::enable_if< ft::is_integral<InputIterator>::value
 		== false >::type *) : _alloc(alloc), _comp(comp), _root(0), _size(0)
 	{
-		iterator	it;
+		InputIterator	it;
 
 		for (it = first; it != last; ++it)
 		{
 			this->insert(*it);
-			++this->_size;
 		}
 		return ;
 	}
@@ -342,6 +341,16 @@ namespace	ft
 	}*/
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::erase(iterator position)
+	{
+		if (position == this->end())
+			return ;
+		this->_delete_node(position.getNode());
+		this->_size -= 1;
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
 	typename map<Key, T, Compare, Alloc>::size_type
 		map<Key, T, Compare, Alloc>::erase(key_type const & k)
 	{
@@ -353,6 +362,34 @@ namespace	ft
 		this->_delete_node(node);
 		this->_size -= 1;
 		return (1);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::erase(iterator first, iterator last)
+	{
+		iterator	aux;
+
+		if (last == this->end())
+		{
+			--last;
+			while (last != first)
+			{
+				aux = last;
+				--last;
+				this->erase(last);
+			}
+			this->erase(last);
+		}
+		else
+		{
+			while (first != last)
+			{
+				aux = first;		
+				++first;
+				this->erase(aux);
+			}
+		}
+		return ;
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
