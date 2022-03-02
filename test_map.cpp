@@ -133,6 +133,22 @@ void	swapping(void)
 	return ;
 }
 
+void	clear(void)
+{
+	ft::map<int, int>	m;
+
+	m.insert(ft::make_pair<int, int>(10, 10));
+	m.insert(ft::make_pair<int, int>(20, 20));
+	m.insert(ft::make_pair<int, int>(30, 30));
+	m.insert(ft::make_pair<int, int>(40, 40));
+	m.insert(ft::make_pair<int, int>(50, 50));
+	m.insert(ft::make_pair<int, int>(60, 60));
+	m.clear();
+	assert(m.size() == 0);
+	std::cout << "\nCLEAR TESTS: OK\n";
+	return ;
+}
+
 void	access(void)
 {
 	ft::map<int, std::string>	m;
@@ -237,6 +253,7 @@ int	main(void)
 	erase_key();
 	erase_iter();
 	swapping();
+	clear();
 	access();
 	observers();
 	find_count();
