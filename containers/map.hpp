@@ -92,6 +92,7 @@ namespace	ft
 		size_type					erase(key_type const & k);
 		void						erase(iterator first, iterator second);
 		void						swap(map & x);
+		void						clear(void);
 
 		//Observers
 		key_compare					key_comp(void) const;
@@ -369,6 +370,11 @@ namespace	ft
 	{
 		iterator	aux;
 
+		if (first == this->begin() && last == this->end())
+		{
+			this->clear();
+			return ;
+		}
 		if (last == this->end())
 		{
 			--last;
@@ -411,6 +417,13 @@ namespace	ft
 			x._size = aux_size;
 			x._root = aux_root;
 		}
+		return ;
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	void	map<Key, T, Compare, Alloc>::clear(void)
+	{
+		this->_delete_tree(this->_root);
 		return ;
 	}
 
@@ -1023,6 +1036,8 @@ namespace	ft
 			this->_delete_tree(child);
 		this->_alloc.destroy(&node->getValue());
 		this->_alloc.deallocate(&node->getValue(), 1);
+		if (!node->getParent())
+			this->_root = 0;
 		delete node;
 		this->_size -= 1;
 		return ;
