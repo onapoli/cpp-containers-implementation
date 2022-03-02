@@ -57,7 +57,7 @@ namespace	ft
 		explicit map(key_compare const & comp = key_compare(),
 			allocator_type const & alloc = allocator_type());
 		//range constructor
-		template <class InputIterator>
+		template <typename InputIterator>
 		map (InputIterator first, InputIterator last,
        		key_compare const & comp = key_compare(),
 			allocator_type const & alloc = allocator_type(),
@@ -86,8 +86,9 @@ namespace	ft
 		ft::pair<iterator, bool>	insert(value_type const & val);
 		iterator					insert(iterator position,
 										value_type const & val);
-		//template <class InputIterator>
-		//void	insert(InputIterator first, InputIterator last);
+		template <typename InputIterator>
+		void						insert(InputIterator first,
+										InputIterator last);
 		void 						erase(iterator position);
 		size_type					erase(key_type const & k);
 		void						erase(iterator first, iterator second);
@@ -321,7 +322,7 @@ namespace	ft
 		return (res);
 	}
 
-	/*template< typename Key, typename T, typename Compare, typename Alloc >
+	template< typename Key, typename T, typename Compare, typename Alloc >
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::insert(iterator position,
 			value_type const & val)
@@ -332,14 +333,47 @@ namespace	ft
 		{
 			this->_root = new TreeNode<Key, T>(false, 0,
 				this->_persist_val(val), 0, 0);
+			this->_size += 1;
 			return (iterator(this->_root));
 		}
-		if ()
-		{}
+		if (this->_comp(position->first, val.first)
+			&& (!position.getNode()->getParent()
+				|| this->_comp(position.getNode()->getParent()->getValue().first,
+					position->first)))
+			pr = this->_insert_node(position.getNode(), val);
+		else if(this->_comp(val.first, position->first)
+			&& (!position.getNode()->getParent()
+				|| this->_comp(position->first,
+				position.getNode()->getParent()->getValue().first)))
+			pr = this->_insert_node(position.getNode(), val);
 		else
 			pr = this->_insert_node(this->_root, val);
+		if (pr.second)
+			this->_size += 1;
 		return (pr.first);
-	}*/
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	template< typename InputIterator>
+	void	map<Key, T, Compare, Alloc>::insert(InputIterator first,
+				InputIterator last)
+	{
+		InputIterator	it;
+		iterator		hint;
+	
+		it = first;
+		if (it != last)
+		{
+			hint = (this->insert(*it)).first;
+			++it;
+			while (it != last)
+			{
+				hint = this->insert(hint, *it);
+				++it;
+			}
+		}
+		return ;
+	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void	map<Key, T, Compare, Alloc>::erase(iterator position)
