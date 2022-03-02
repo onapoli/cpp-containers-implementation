@@ -54,6 +54,41 @@ void	insertion(void)
 	return ;
 }
 
+void	insertion_iter(void)
+{
+	ft::map<int, int>			m;
+	ft::map<int, int>			m2;
+	ft::map<int, int>::iterator	it;
+	int							counter;
+
+	m.insert(ft::pair<int, int>(20, 20));
+	it = m.begin();
+	m.insert(it, ft::pair<int, int>(30, 30));
+	m.insert(it, ft::pair<int, int>(10, 10));
+	it = m.find(30);
+	m.insert(it, ft::pair<int, int>(40, 40));
+	//BAD PERFORMANCE BECAUSE OF BAD HINT
+	m.insert(it, ft::pair<int, int>(50, 50));
+	m.insert(it, ft::pair<int, int>(60, 60));
+	assert(m.size() == 6);
+	counter = 10;
+	for (it = m.begin(); it != m.end(); ++it)
+	{
+		assert(it->first == counter);
+		counter += 10;
+	}
+	m2.insert(m.begin(), m.upper_bound(40));
+	assert(m2.size() == 4);
+	counter = 10;
+	for (it = m2.begin(); it != m2.end(); ++it)
+	{
+		assert(it->first == counter);
+		counter += 10;
+	}
+	std::cout << "\nINSERTION WITH ITERATORS TESTS: OK\n";
+	return ;
+}
+
 void	erase_key(void)
 {
 	ft::map<int, int>	m;
@@ -250,6 +285,7 @@ int	main(void)
 {
 	construction();
 	insertion();
+	insertion_iter();
 	erase_key();
 	erase_iter();
 	swapping();
