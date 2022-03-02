@@ -54,7 +54,7 @@ void	insertion(void)
 	return ;
 }
 
-void	erase(void)
+void	erase_key(void)
 {
 	ft::map<int, int>	m;
 	std::size_t			res;
@@ -88,7 +88,31 @@ void	erase(void)
 	res = m.erase(60);
 	assert(res == 1);
 	assert(m.empty() == true);
-	std::cout << "\nERASE TESTS: OK\n";
+	std::cout << "\nERASE KEY TESTS: OK\n";
+	return ;
+}
+
+void	erase_iter(void)
+{
+	ft::map<int, int>			m;
+	ft::map<int, int>::iterator	it;
+	int							counter;
+
+	m.insert(ft::make_pair<int, int>(10, 10));
+	m.insert(ft::make_pair<int, int>(20, 20));
+	m.insert(ft::make_pair<int, int>(30, 30));
+	m.insert(ft::make_pair<int, int>(40, 40));
+	m.insert(ft::make_pair<int, int>(50, 50));
+	m.insert(ft::make_pair<int, int>(60, 60));
+	m.erase(m.find(50));
+	m.erase(m.lower_bound(40), m.upper_bound(60));
+	counter = 10;
+	for (it = m.begin(); it != m.end(); ++it)
+	{
+		assert(it->first == counter);
+		counter += 10;
+	}
+	std::cout << "\nERASE ITER TESTS: OK\n";
 	return ;
 }
 
@@ -210,7 +234,8 @@ int	main(void)
 {
 	construction();
 	insertion();
-	erase();
+	erase_key();
+	erase_iter();
 	swapping();
 	access();
 	observers();
