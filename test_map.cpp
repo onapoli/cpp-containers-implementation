@@ -214,6 +214,8 @@ void	observers(void)
 	it = m.end();
 	--it;
 	assert(cmp(m.begin()->first, it->first));
+	assert(m.value_comp()(*(m.begin()), *(m.find(2))) == true);
+	assert(m.value_comp()(*(m.find(2)), *(m.begin())) == false);
 	std::cout << "\nOBSERVERS TESTS: OK\n";
 	return ;
 }
