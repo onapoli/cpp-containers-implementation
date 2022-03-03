@@ -64,11 +64,32 @@ void	comparison(void)
 	return ;
 }
 
+void	constness(void)
+{
+	ft::map<int, int>					m;
+	ft::map<int, int>::const_iterator	it;
+	int									counter;
+
+	m.insert(ft::pair<int, int>(10, 10));
+	m.insert(ft::pair<int, int>(20, 20));
+	counter = 10;
+	for (it = m.begin(); it != m.end(); ++it)
+	{
+		//THIS STATEMENT GENERATES COMPILATION ERROR, AS it IS CONST
+		//*it = ft::pair<int, int>(2, 2);
+		assert(counter == it->first);
+		counter += 10;
+	}
+	std::cout << "\nCONSTNESS TESTS: OK\n";
+	return ;
+}
+
 int	main(void)
 {
 	construction();
 	add_sub();
 	comparison();
+	constness();
 	std::cout << std::endl;
 	return (0);
 }
