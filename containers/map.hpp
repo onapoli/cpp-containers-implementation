@@ -61,8 +61,8 @@ namespace	ft
 		typedef typename allocator_type::const_reference	const_reference;
 		typedef	typename allocator_type::pointer			pointer;
 		typedef	typename allocator_type::const_pointer		const_pointer;
-		typedef	map_iter<Key, T, Compare, Alloc>			iterator;
-		typedef	map_iter<Key, T const, Compare, Alloc>		const_iterator;
+		typedef	map_iter<Key, T, false, Compare, Alloc>		iterator;
+		typedef	map_iter<Key, T, true, Compare, Alloc>		const_iterator;
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
 
