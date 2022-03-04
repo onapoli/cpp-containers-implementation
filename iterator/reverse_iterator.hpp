@@ -78,7 +78,9 @@ namespace	ft
 	typename reverse_iterator<Iterator>::reference
 		reverse_iterator<Iterator>::operator*(void) const
 	{
-		return (*(this->_it - 1));
+		iterator_type	it(this->_it);
+
+		return (*(--it));
 	}
 
 	template< typename Iterator >

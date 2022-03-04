@@ -302,36 +302,39 @@ namespace	ft
 	typename vector< T, Alloc >::reverse_iterator
 		vector< T, Alloc >::rbegin(void)
 	{
-		reverse_iterator	it(this->_content + this->_size);
+		iterator	it(this->_content + this->_size);
 
-		return (it);
+		return (reverse_iterator(it));
 	}
 
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::const_reverse_iterator
 		vector< T, Alloc >::rbegin(void) const
 	{
-		const_reverse_iterator	it(this->_content + this->_size);
+		reverse_iterator	rit;
+		
+		rit = this->rbegin();
 
-		return (it);
+		return (const_reverse_iterator(rit));
 	}
 
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::reverse_iterator
 		vector< T, Alloc >::rend(void)
 	{
-		reverse_iterator	it(this->_content);
+		iterator	it(this->_content);
 
-		return (it);
+		return (reverse_iterator(it));
 	}
 
 	template< typename T, typename Alloc >
 	typename vector< T, Alloc >::const_reverse_iterator
 		vector< T, Alloc >::rend(void) const
 	{
-		const_reverse_iterator	it(this->_content);
-
-		return (it);
+		reverse_iterator	rit;
+		
+		rit = this->rend();
+		return (const_reverse_iterator(rit));
 	}
 
 	// capacity Functions
