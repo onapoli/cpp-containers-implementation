@@ -67,17 +67,26 @@ void	comparison(void)
 void	constness(void)
 {
 	ft::map<int, int>					m;
-	ft::map<int, int>::const_iterator	it;
+	ft::map<int, int>::iterator			it;
+	ft::map<int, int>::const_iterator	cit(it);
+	//COMPILATION ERROR, AS iterator CANNOT COPY const_iterator
+	//ft::map<int, int>::iterator			it2(cit);
+	ft::map<int, int>::iterator			it2;
 	int									counter;
 
 	m.insert(ft::pair<int, int>(10, 10));
 	m.insert(ft::pair<int, int>(20, 20));
+	it = m.begin();
+	cit = it;
+	it2 = it;
+	//COMPILATION ERROR, AS iterator CANNOT BE ASSIGNED const_iterator
+	//it = cit;
 	counter = 10;
-	for (it = m.begin(); it != m.end(); ++it)
+	for (cit = m.begin(); cit != m.end(); ++cit)
 	{
-		//THIS STATEMENT GENERATES COMPILATION ERROR, AS it IS CONST
-		//*it = ft::pair<int, int>(2, 2);
-		assert(counter == it->first);
+		//COMPILATION ERROR, AS cit IS CONST
+		//*cit = ft::pair<int, int>(2, 2);
+		assert(counter == cit->first);
 		counter += 10;
 	}
 	std::cout << "\nCONSTNESS TESTS: OK\n";
