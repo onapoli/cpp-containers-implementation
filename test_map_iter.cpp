@@ -93,12 +93,35 @@ void	constness(void)
 	return ;
 }
 
+void	reverse(void)
+{
+	ft::map<int, int>					m;
+	ft::map<int, int>::reverse_iterator	rit;
+	int									counter;
+
+	m.insert(ft::pair<int, int>(1, 1));
+	m.insert(ft::pair<int, int>(2, 2));
+	m.insert(ft::pair<int, int>(3, 3));
+	counter = 3;
+	for (rit = m.rbegin(); rit != m.rend(); ++rit)
+	{
+		std::cout << rit->first << std::endl;
+		assert(rit->first == counter);
+		--counter;
+	}
+	// COMPILATION ERROR: INVALID OPERANDS FOR bidirectional iterator
+	//assert( (rit < m.rbegin()) == false );
+	std::cout << "\nREVERSE TESTS: OK\n";
+	return ;
+}
+
 int	main(void)
 {
 	construction();
 	add_sub();
 	comparison();
 	constness();
+	reverse();
 	std::cout << std::endl;
 	return (0);
 }
