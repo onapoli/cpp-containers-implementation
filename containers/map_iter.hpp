@@ -4,10 +4,11 @@
 # include <iterator>
 
 # include "TreeNode.hpp"
+# include "../type_traits/type_traits.hpp"
 
 /*
 **	STRUCTURE TO SELECT THE RIGHT map_iter reference AND pointer TYPE
-**	THROUGH SFINAE
+**	THROUGH SFINAE AND PARTIAL TEMPLATE SPECIALIZATION.
 */
 
 template <bool flag, class IsTrue, class IsFalse>
@@ -75,8 +76,13 @@ public:
 
 	~map_iter(void);
 
+	/*
+	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
+	**	FROM const_iterator.
+	*/
 	map_iter<Key, T, IsConst, Compare, Alloc> &
 		operator=(map_iter<Key, T, false, Compare, Alloc> const & rhs);
+	
 	bool		operator!=(map_iter const & rhs) const;
 	bool		operator==(map_iter const & rhs) const;
 	reference	operator*(void) const;
