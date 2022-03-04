@@ -9,6 +9,7 @@
 
 # include "../utility/utility.hpp"
 # include "../type_traits/type_traits.hpp"
+# include "../iterator/iterator.hpp"
 # include "map_iter.hpp"
 # include "TreeNode.hpp"
 
@@ -63,6 +64,9 @@ namespace	ft
 		typedef	typename allocator_type::const_pointer		const_pointer;
 		typedef	map_iter<Key, T, false, Compare, Alloc>		iterator;
 		typedef	map_iter<Key, T, true, Compare, Alloc>		const_iterator;
+		typedef ft::reverse_iterator<iterator>				reverse_iterator;
+		/*typedef ft::reverse_iterator<iterator, true>
+			const_reverse_iterator;*/
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
 
@@ -86,6 +90,10 @@ namespace	ft
 		const_iterator				begin(void)	const;
 		iterator					end(void);
 		const_iterator				end(void) const;
+		reverse_iterator			rbegin(void);
+		//const_reverse_iterator		rbegin(void) const;
+		reverse_iterator			rend(void);
+		//const_reverse_iterator		rend(void) const;
 	
 		//Capacity
 		bool						empty(void) const;
@@ -281,6 +289,36 @@ namespace	ft
 		it = const_iterator(node);
 		++it;
 		return (it);
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::reverse_iterator
+		map<Key, T, Compare, Alloc>::rbegin(void)
+	{
+		TreeNode<Key, T> *	node;
+		iterator			it;
+
+		node = this->_root;
+		while (node->getRight())
+			node = node->getRight();
+		it = iterator(node);
+		++it;
+		return (reverse_iterator(it));
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::reverse_iterator
+		map<Key, T, Compare, Alloc>::rend(void)
+	{
+		TreeNode<Key, T> *	node;
+		iterator			it;
+
+		node = this->_root;
+		while (node->getLeft())
+			node = node->getLeft();
+		it = iterator(node);
+		//--it;
+		return (reverse_iterator(it));
 	}
 
 	//Capacity
