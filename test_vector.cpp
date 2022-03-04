@@ -179,8 +179,7 @@ void	rev_iter(void)
 	ft::vector<int>						v(5, 0);
 	std::size_t							i;
 	ft::vector<int>::iterator			it;
-	ft::vector<int>::reverse_iterator	rit(v.end());
-	ft::vector<int>::reverse_iterator	rit2(v.begin());
+	ft::vector<int>::reverse_iterator	rit;
 	int									counter;
 	int									base_counter;
 
@@ -192,7 +191,7 @@ void	rev_iter(void)
 	std::cout << " in memory inspector." << "\n";
 	counter = 4;
 	base_counter = 5;
-	for (; rit != rit2; ++rit)
+	for (rit = v.rbegin(); rit != v.rend(); ++rit)
 	{
 		std::cout << "value: " << *rit << " base: " << *(rit.base()) << "\n";
 		if (counter == 4)
@@ -353,7 +352,7 @@ void	non_member_relational(void)
 	v.back() = 200;
 	assert( (v > v2) == false);
 	assert( (v < v2) == true);
-	std::cout << "\nNON-MEMBER RELATIONAL TESTS\n";
+	std::cout << "\nNON-MEMBER RELATIONAL TESTS: OK\n";
 	return ;
 }
 
