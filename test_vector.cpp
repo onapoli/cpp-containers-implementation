@@ -1,5 +1,6 @@
 #include <iostream>
 #include <typeinfo>
+#include <cassert>
 
 #include "./containers/vector.hpp"
 #include "./type_traits/type_traits.hpp"
@@ -7,8 +8,6 @@
 // default, fill, range and copy Contructor tests.
 void	construction(void)
 {
-	std::cout << "\n\n--- CONSTRUCTION TESTS ---\n";
-
 	ft::vector<int>	v;
 	ft::vector<int>	v2(2);
 	ft::vector<int>	v3(3, 1);
@@ -17,13 +16,14 @@ void	construction(void)
 	int	a[3] = {1, 2, 3};
 	ft::vector<int>	v6(a, a + 3);
 
-	std::cout << "v size: " << v.size() << "\n";
-	std::cout << "v2 size: " << v2.size() << "\n";
-	std::cout << "v3 size: " << v3.size() << "\n";
-	std::cout << "v4 size: " << v4.size() << "\n";
-	std::cout << "v5 size: " << v5.size() << "\n";
-	std::cout << "v6 size: " << v6.size() << "\n";
-	std::cout << "v6.at(1) " << v6.at(1) << "\n";
+	assert(v.size() == 0);
+	assert(v2.size() == 2);
+	assert(v3.size() == 3);
+	assert(v4.size() == 3);
+	assert(v5.size() == 3);
+	assert(v6.size() == 3);
+	assert(v6.at(1) == 2);
+	std::cout << "\nCONSTRUCTION TESTS: OK\n";
 	return ;
 }
 
@@ -37,18 +37,19 @@ void	size(void)
 	ft::vector<int>				v2(5);
 
 	vs = v.size();
-	std::cout << "v.size(): " << v.size() << ", v.capacity(): " << v.capacity() << "\n";
-	std::cout << "vs: " << vs << "\n";
+	assert(v.size() == 0 && v.capacity() == 0);
+	assert(vs == 0);
 	std::cout << "v.max_size(): " << v.max_size() << std::endl;
-	std::cout << "v2.size(): " << v2.size() << ", v2.capacity(): " << v2.capacity() << "\n";
+	assert(v2.size() == 5 && v2.capacity() == 5);
 	v2.resize(8);
-	std::cout << "v2.size(): " << v2.size() << ", v2.capacity(): " << v2.capacity() << "\n";
+	assert(v2.size() == 8 && v2.capacity() == 10);
 	v2.resize(7);
-	std::cout << "v2.size(): " << v2.size() << ", v2.capacity(): " << v2.capacity() << "\n";
+	assert(v2.size() == 7 && v2.capacity() == 10);
 	v2.resize(4);
-	std::cout << "v2.size(): " << v2.size() << ", v2.capacity(): " << v2.capacity() << "\n";
+	assert(v2.size() == 4 && v2.capacity() == 8);
 	v2.resize(20);
-	std::cout << "v2.size(): " << v2.size() << ", v2.capacity(): " << v2.capacity() << "\n";
+	assert(v2.size() == 20 && v2.capacity() == 20);
+	std::cout << "\nSIZE TESTS: OK\n";
 	return ;
 }
 
@@ -58,21 +59,22 @@ void	access(void)
 	ft::vector<int> v(5, 1);
 	ft::vector<int> const v2(2);
 
-	std::cout << "v.front(): " << v.front() << "\n";
-	std::cout << "v2.front(): " << v2.front() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
-	std::cout << "v2.back(): " << v2.back() << "\n";
-	std::cout << "v.at(4): " << v.at(4) << "\n";
+	assert(v.front() == 1);
+	assert(v2.front() == 0);
+	assert(v.back() == 1);
+	assert(v2.back() == 0);
+	assert(v.at(4) == 1);
 	try
 	{
 		std::cout << "v2.at(4): " << v2.at(5) << "\n";
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "\nERROR: " << e.what() << '\n';
+		std::cerr << "\nEXPECTED ERROR: " << e.what() << '\n';
 	}
-	std::cout << "v[4]: " << v[4] << "\n";
+	assert(v[4] == 1);
 	std::cout << "v2[4] (Undefined behaviour!!): " << v2[4] << "\n";
+	std::cout << "\nACCESS TESTS: OK\n";
 	return ;
 }
 
@@ -83,37 +85,34 @@ void	exception(void)
 
 void	iterator(void)
 {
-	std::cout << "\n\n--- ITERATOR TESTS ---\n";
 	ft::vector<int>				v;
 	ft::vector<int>::iterator	it;
 	ft::vector<int>				v2(2, 1);
 
 	it = v.begin();
-	if (it == v.begin())
-		std::cout << "Equal\n";
+	assert(it == v.begin());
 	it = v.end();
-	if (it == v.begin())
-		std::cout << "Equal\n";
-	//ERROR (Seg.Fault) Trying to access unallocated memory:
+	assert(it == v.begin());
+	//ERROR (Seg.Fault) Trying to access non-allocated memory:
 	//std::cout << "end value: " << *it << std::endl;
 	it = v2.begin();
 	*it = 42;
-	std::cout << "v2[0]: " << v2[0] << "\n";
-	std::cout << "*it: " << *it << "\n";
+	assert(v2[0] == 42);
+	assert(*it == 42);
 	++it;
-	std::cout << "*it: " << *it << "\n";
+	assert(*it == 1);
 	it = v2.begin();
 	it++;
-	std::cout << "*it: " << *it << "\n";
+	assert(*it == 1);
 	it = v2.begin();
-	std::cout << "*it++: " << *it++ << "\n";
-	std::cout << "*it: " << *it << "\n";
+	assert(*it++ == 42);
+	assert(*it == 1);
+	std::cout << "\nITERATOR TESTS: OK\n";
 	return ;
 }
 
 void	iterator_arithmetic(void)
 {
-	std::cout << "\n\n--- ITERATOR ARITHMETIC TESTS ---\n";
 	ft::vector<int>			v(5, 1);
 	ft::vector<int>::iterator	it;
 	ft::vector<int>::iterator	it2;
@@ -122,45 +121,55 @@ void	iterator_arithmetic(void)
 		*(v.begin() + i) = i;
 	it = v.begin();
 	it2 = v.begin() + 2;
-	std::cout << *it << "\n";
-	std::cout << *(it + 1) << "\n";
-	std::cout << *it << "\n";
+	assert(*it == 0);
+	assert(*(it + 1) == 1);
+	assert(*it == 0);
 	*(it + 1) = 42;
-	std::cout << v[1] << "\n";
+	assert(v[1] == 42);
 	it2 = it + 1;
-	std::cout << *it2 << "\n";
+	assert(*it2 == 42);
 	*(it + 1) = 1;
 	it2 = v.begin() + 3;
-	std::cout << it2 - it << "\n";
+	assert(it2 - it == 3);
+	std::cout << "\nITERATOR ARITHMETIC TESTS: OK\n";
 	return ;
 }
 
 void	iterator_constness(void)
 {
-	std::cout << "\n\n--- ITERATOR CONSTNESS TESTS ---\n";
-	ft::vector<int> const			v(2, 1);
+	ft::vector<int>					v(2, 1);
+	ft::vector<int>::iterator		it;
 	ft::vector<int>::const_iterator	cit;
+	//DOES NOT COMPILE
+	//ft::vector<int>::iterator		it2(cit);
+	ft::vector<int>::const_iterator	cit2(it);
 
+	it = v.begin();
+	cit = it;
+	//DOES NOT COMPILE
+	//it = cit;
+	cit2 = cit;
 	for (cit = v.begin(); cit != v.end(); ++cit)
 	{
-		std::cout << *cit << "\n";
+		assert(*cit == 1);
 	}
 	cit = v.begin();
-	//*cit = 2; DOES NOT COMPILE
+	//DOES NOT COMPILE
+	// *cit = 2;
+	std::cout << "\nITERATOR CONSTNESS TESTS: OK\n";
 	return ;
 }
 
 void	iter_traits(void)
 {
-	std::cout << "\n\n--- ITERATOR TRAITS TESTS ---\n";
 	typedef ft::vector<int>::iterator						my_iter_type;
 	ft::iterator_traits<my_iter_type>::iterator_category	cat;
 	ft::iterator_traits<int*>::iterator_category			cat2;
 
-	std::cout << "Is ft::vector<int>::iterator a random_access_iterator? ";
-	std::cout << (typeid(cat) == typeid(std::random_access_iterator_tag)) << "\n";
-	std::cout << "Is int* a random_access_iterator? ";
-	std::cout << (typeid(cat2) == typeid(std::random_access_iterator_tag)) << "\n";	
+	assert( (typeid(cat) == typeid(std::random_access_iterator_tag) ) == true);
+	assert( (typeid(cat2) == typeid(std::random_access_iterator_tag) ) == true);
+	assert( (typeid(int) == typeid(std::random_access_iterator_tag) ) == false);
+	std::cout << "\nITERATOR TRAITS TESTS: OK\n";
 	return ;
 }
 
@@ -172,257 +181,179 @@ void	rev_iter(void)
 	ft::vector<int>::iterator			it;
 	ft::vector<int>::reverse_iterator	rit(v.end());
 	ft::vector<int>::reverse_iterator	rit2(v.begin());
+	int									counter;
+	int									base_counter;
 
 	i = 0;
 	for (it = v.begin(); it != v.end(); ++it)
 		*it = i++;
 	std::cout << "The first dereference of rit.base()";
-	std::cout << " will generate an invalid read WARNING." << "\n";
+	std::cout << " will generate an invalid read WARNING";
+	std::cout << " in memory inspector." << "\n";
+	counter = 4;
+	base_counter = 5;
 	for (; rit != rit2; ++rit)
+	{
 		std::cout << "value: " << *rit << " base: " << *(rit.base()) << "\n";
+		if (counter == 4)
+			assert(*rit == counter && *(rit.base()) == 0);
+		else
+			assert(*rit == counter && *(rit.base()) == base_counter);
+		--counter;
+		--base_counter;
+	}
+	std::cout << "\nREVERSE ITERATOR TESTS: OK\n";
 	return ;
 }
 
 void	modifier_assign(void)
 {
-	std::cout << "\n\n--- ASSIGN TESTS ---\n";
 	ft::vector<int>	v;
 	ft::vector<int>	v2(2, 24);
 
 	v.assign(5, 42);
-	std::cout << "v.size(): " << v.size() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
+	assert(v.size() == 5);
+	assert(v.back() == 42);
 	v.assign(v2.begin(), v2.end());
-	std::cout << "v.size(): " << v.size() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
+	assert(v.size() == 2);
+	assert(v.back() == 24);
+	std::cout << "\nASSIGN TESTS: OK\n";
 	return ;
 }
 
 void	modifier_push_pop_back(void)
 {
-	std::cout << "\n\n--- PUSH && POP TESTS ---\n";
 	ft::vector<int>	v(2, 100);
 
-	std::cout << "v.capacity(): " << v.capacity();
-	std::cout << " v.size(): " << v.size() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
+	assert(v.capacity() == 2 && v.size() == 2);
+	assert(v.back() == 100);
 	v.push_back(42);
-	std::cout << "EXECUTE v.push_back(42)" << "\n";
-	std::cout << "v.capacity(): " << v.capacity();
-	std::cout << " v.size(): " << v.size() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
+	assert(v.capacity() == 4 && v.size() == 3);
+	assert(v.back() == 42);
 	v.pop_back();
-	std::cout << "EXECUTE v.pop_back()" << "\n";
-	std::cout << "v.capacity(): " << v.capacity();
-	std::cout << " v.size(): " << v.size() << "\n";
-	std::cout << "v.back(): " << v.back() << "\n";
+	assert(v.capacity() == 4 && v.size() == 2);
+	assert(v.back() == 100);
+	std::cout << "\nPUSH && POP TESTS: OK\n";
 	return ;
 }
 
 void	modifier_insert(void)
 {
-	std::cout << "\n\n--- MODIFIER INSERT TESTS ---\n";
 	ft::vector<int>				v(4, 42);
 	ft::vector<int>				v2(5, 5000);
 	ft::vector<int>::iterator	it;
 
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	std::cout << "\nEXECUTED v.insert(v.begin() + 2, 24)\n" << "\n";
+	assert(v.size() == 4 && v.capacity() == 4);
 	v.insert(v.begin() + 2, 24);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.begin(), 80)\n" << "\n";
+	assert(v.at(2) == 24);
+	assert(v.size() == 5 && v.capacity() == 8);
 	v.insert(v.begin(), 80);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.end(), 80)\n" << "\n";
+	assert(v.at(0) == 80);
+	assert(v.size() == 6 && v.capacity() == 8);
 	v.insert(v.end(), 80);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.begin() + 4, 2, 100)\n" << "\n";
+	assert(v.at(6) == 80);
+	assert(v.size() == 7 && v.capacity() == 8);
 	v.insert(v.begin() + 4, 2, 100);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.begin(), 1, 42000)\n" << "\n";
+	assert(v.at(4) == 100 && v.at(5) == 100);
+	assert(v.size() == 9 && v.capacity() == 16);
 	v.insert(v.begin(), 1, 42000);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.end(), 2, 42000)\n" << "\n";
+	assert(v.at(0) == 42000);
+	assert(v.size() == 10 && v.capacity() == 16);
 	v.insert(v.end(), 2, 42000);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
-	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
-	}
-	std::cout << "\nEXECUTED v.insert(v.begin() + 5, v2.begin(), v2.end())\n" << "\n";
+	assert(v.at(10) == 42000 && v.at(11) == 42000);
+	assert(v.size() == 12 && v.capacity() == 16);
 	v.insert(v.begin() + 5, v2.begin(), v2.end());
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(); it < v.end(); ++it)
+	assert(v.size() == 17 && v.capacity() == 32);
+	for (it = v.begin() + 5; it != v.begin() + 10; ++it)
 	{
-		std::cout << "index: " << it - v.begin() << " val: " << *it << "\n";
+		assert(*it == 5000);
 	}
+	std::cout << "\nMODIFIER INSERT TESTS: OK\n";
 	return ;
 }
 
 void	modifier_erase(void)
 {
-	std::cout << "\n\n--- MODIFIER ERASE TESTS ---\n";
 	ft::vector<int>				v(5, 500);
 	ft::vector<int>::iterator	it;
 	int							i;
+	int							counter;
 
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
+	assert(v.size() == 5 && v.capacity() == 5);
+	counter = 0;
 	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
 	{
 		*it = i;
-		std::cout << "index: " << i << " value: " << *it << "\n";
+		assert(*it == counter);
+		++counter;
 	}
-	std::cout << "EXECUTED v.erase(v.begin() + 2)" << "\n";
 	v.erase(v.begin() + 2);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
-	{
-		std::cout << "index: " << i << " value: " << *it << "\n";
-	}
-	std::cout << "EXECUTED v.erase(v.begin())" << "\n";
+	assert(v.size() == 4 && v.capacity() == 5);
+	assert(v.at(2) == 3);
 	v.erase(v.begin());
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
-	{
-		std::cout << "index: " << i << " value: " << *it << "\n";
-	}
-	std::cout << "EXECUTED v.erase(v.begin())" << "\n";
+	assert(v.size() == 3 && v.capacity() == 5);
+	assert(v.at(0) == 1);
+	// ERASES THE LAST ELEMENT. NOT THE PENULTIMATE
 	v.erase(v.end() - 1);
-	std::cout << "v.size(): " << v.size() << " v.capacity(): " << v.capacity() << "\n";
-	for (it = v.begin(), i = 0; it != v.end(); ++it, ++i)
-	{
-		std::cout << "index: " << i << " value: " << *it << "\n";
-	}
+	assert(v.size() == 2 && v.capacity() == 4);
+	assert(v.at(1) == 3);
+	std::cout << "\nMODIFIER ERASE TESTS: OK\n";
 	return ;
 }
 
 void	modifier_swap(void)
 {
-	std::cout << "\n\n--- MODIFIER SWAP TESTS ---\n";
 	ft::vector<int>				v(5, 500);
 	ft::vector<int>				v2(2, 200);
 	ft::vector<int>::iterator	it;
 
-	std::cout << "vector v:\n";
-	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
-	std::cout << v.capacity() << "\n";
-	for (it = v.begin(); it != v.end(); ++it)
-	{
-		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
-	}
-	std::cout << "vector v2:\n";
-	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
-	std::cout << v2.capacity() << "\n";
-	for (it = v2.begin(); it != v2.end(); ++it)
-	{
-		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
-	}
 	v.swap(v2);
-	std::cout << "\nEXECUTED v.swap(v2)\n\n";
-	std::cout << "vector v:\n";
-	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
-	std::cout << v.capacity() << "\n";
-	for (it = v.begin(); it != v.end(); ++it)
-	{
-		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
-	}
-	std::cout << "vector v2:\n";
-	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
-	std::cout << v2.capacity() << "\n";
-	for (it = v2.begin(); it != v2.end(); ++it)
-	{
-		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
-	}
+	assert(v.size() == 2 && v.capacity() == 2);
+	assert(v.at(0) == 200 && v.at(1) == 200);
+	assert(v2.size() == 5 && v2.capacity() == 5);
+	assert(v2.at(0) == 500 && v2.at(4) == 500);
+	v2.swap(v);
+	assert(v.size() == 5 && v.capacity() == 5);
+	assert(v.at(0) == 500 && v.at(4) == 500);
+	assert(v2.size() == 2 && v2.capacity() == 2);
+	assert(v2.at(0) == 200 && v2.at(1) == 200);
+	std::cout << "\nMODIFIER SWAP TESTS: OK\n";
 	return ;
 }
 
 void	non_member_swap(void)
 {
-	std::cout << "\n\n--- MODIFIER SWAP TESTS ---\n";
 	ft::vector<int>				v(5, 500);
 	ft::vector<int>				v2(2, 200);
 	ft::vector<int>::iterator	it;
 
-	std::cout << "vector v:\n";
-	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
-	std::cout << v.capacity() << "\n";
-	for (it = v.begin(); it != v.end(); ++it)
-	{
-		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
-	}
-	std::cout << "vector v2:\n";
-	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
-	std::cout << v2.capacity() << "\n";
-	for (it = v2.begin(); it != v2.end(); ++it)
-	{
-		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
-	}
 	ft::swap(v, v2);
-	std::cout << "\nEXECUTED ft::swap(v, v2)\n\n";
-	std::cout << "vector v:\n";
-	std::cout << "v.size(): " << v.size() << " v.capacity(): ";
-	std::cout << v.capacity() << "\n";
-	for (it = v.begin(); it != v.end(); ++it)
-	{
-		std::cout << "index " << it - v.begin() << ": " << *it << "\n";
-	}
-	std::cout << "vector v2:\n";
-	std::cout << "v2.size(): " << v2.size() << " v2.capacity(): ";
-	std::cout << v2.capacity() << "\n";
-	for (it = v2.begin(); it != v2.end(); ++it)
-	{
-		std::cout << "index " << it - v2.begin() << ": " << *it << "\n";
-	}
+	assert(v.size() == 2 && v.capacity() == 2);
+	assert(v.at(0) == 200 && v.at(1) == 200);
+	assert(v2.size() == 5 && v2.capacity() == 5);
+	assert(v2.at(0) == 500 && v2.at(4) == 500);
+	std::cout << "\nNON_MEMBER SWAP TESTS: OK\n";
 	return ;
 }
 
 void	non_member_relational(void)
 {
-	std::cout << "\n\n--- RELATIONAL TESTS ---\n";
 	ft::vector<int>	v(2, 200);
 	ft::vector<int>	v2(v);
 
-	std::cout << "v(2, 200)\nv2(v)\n";
-	std::cout << std::boolalpha;
-	std::cout << "v == v2 ? " << (v == v2) << "\n";
-	std::cout << "v >= v2 ? " << (v >= v2) << "\n";
-	std::cout << "v != v2 ? " << (v != v2) << "\n";
+	assert( (v == v2) == true);
+	assert( (v >= v2) == true);
+	assert( (v != v2) == false);
 	v.back() = 201;
-	std::cout << "\nEXECUTED v.back() = 201\n\n";
-	std::cout << "v > v2 ? " << (v > v2) << "\n";
-	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	assert( (v > v2) == true);
+	assert( (v < v2) == false);
 	v2.push_back(200);
-	std::cout << "\nEXECUTED v2.push_back(200)\n\n";
-	std::cout << "v > v2 ? " << (v > v2) << "\n";
-	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	assert( (v > v2) == true);
+	assert( (v < v2) == false);
 	v.back() = 200;
-	std::cout << "\nEXECUTED v.back() = 200\n\n";
-	std::cout << "v > v2 ? " << (v > v2) << "\n";
-	std::cout << "v < v2 ? " << (v < v2) << "\n";
+	assert( (v > v2) == false);
+	assert( (v < v2) == true);
+	std::cout << "\nNON-MEMBER RELATIONAL TESTS\n";
 	return ;
 }
 
@@ -444,5 +375,6 @@ int	main(void)
 	modifier_swap();
 	non_member_swap();
 	non_member_relational();
+	std::cout << std::endl;
 	return (0);
 }
