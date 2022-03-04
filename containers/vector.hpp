@@ -29,8 +29,8 @@ namespace	ft
 		typedef Alloc									allocator_type;
 		typedef std::size_t								size_type;
 		typedef	ptrdiff_t								difference_type;
-		typedef vector_iter<T>							iterator;
-		typedef vector_iter<const T>					const_iterator;
+		typedef vector_iter<T, false>					iterator;
+		typedef vector_iter<T, true>					const_iterator;
 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef ft::reverse_iterator<const iterator>	const_reverse_iterator;
 

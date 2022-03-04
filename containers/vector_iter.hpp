@@ -1,221 +1,283 @@
 #ifndef VECTOR_ITER_H
 # define VECTOR_ITER_H
 
-namespace ft
+# include "../type_traits/type_traits.hpp"
+
+/*
+**	STRUCTURE TO SELECT THE RIGHT vector_iter reference AND pointer TYPE
+**	THROUGH SFINAE AND PARTIAL TEMPLATE SPECIALIZATION.
+*/
+
+template <bool flag, class IsTrue, class IsFalse>
+struct choose;
+
+template <class IsTrue, class IsFalse>
+struct choose<true, IsTrue, IsFalse> {
+	typedef IsTrue type;
+};
+
+template <class IsTrue, class IsFalse>
+struct choose<false, IsTrue, IsFalse> {
+	typedef IsFalse type;
+};
+
+
+
+/*
+**	vector ITERATOR CLASS DECLARATION
+*/
+
+template< typename T, bool IsConst >
+class vector_iter
 {
 
-	template< typename T >
-	class vector_iter
-	{
-
-	public:
-
-		/*
-		**	Types for iterator_traits
-		**
-		**	Including these types is the modern way of writing iterators,
-		**	instead of inheriting from std::iterator.
-		**	Iterator tags are used by <algorithm> functions to determine the
-		**	most efficient algorithm to use.
-		*/
-		typedef T								value_type;
-		typedef	T*								pointer;
-		typedef T&								reference;
-		typedef std::size_t						size_type;
-		typedef	ptrdiff_t						difference_type;
-		typedef std::random_access_iterator_tag	iterator_category;
-
-		//Default constructor
-		vector_iter<T>(void);
-		explicit vector_iter<T>(pointer v);
-		vector_iter<T>(vector_iter<T> const & src);
-
-		vector_iter<T> &	operator=(vector_iter<T> const & rhs);
-		bool				operator!=(vector_iter<T> const & rhs) const;
-		bool				operator==(vector_iter<T> const & rhs) const;
-		reference			operator*(void) const;
-		pointer				operator->(void) const;
-		vector_iter<T> &	operator++(void);
-		vector_iter<T>		operator++(int);
-		vector_iter<T> &	operator--(void);
-		vector_iter<T>		operator--(int);
-		vector_iter<T>		operator+(difference_type offset) const;
-		vector_iter<T>		operator-(difference_type offset) const;
-		difference_type		operator-(vector_iter<T> const & rhs) const;
-		bool				operator<(vector_iter<T> const & rhs) const;
-		bool				operator>(vector_iter<T> const & rhs) const;
-		bool				operator<=(vector_iter<T> const & rhs) const;
-		bool				operator>=(vector_iter<T> const & rhs) const;
-		vector_iter<T> &	operator+=(difference_type offset);
-		vector_iter<T> &	operator-=(difference_type offset);
-		reference			operator[](difference_type offset) const;
-
-	private:
-
-		pointer	_v;
-
-	};
-
-	template< typename T >
-	vector_iter<T>::vector_iter(void) : _v(0)
-	{
-		std::cout << "vector_iter default constructor called" << std::endl;
-		return ;
-	}
-
-	template< typename T >
-	vector_iter<T>::vector_iter(pointer v) : _v(v)
-	{
-		std::cout << "vector_iter parameterized constructor called";
-		std::cout << std::endl;
-		return ;
-	}
-
-	template< typename T >
-	vector_iter<T>::vector_iter(vector_iter<T> const & src)
-	{
-		std::cout << "vector_iter copy constructor called" << std::endl;
-		*this = src;
-		return ;
-	}
-
-	template< typename T >
-	vector_iter<T> &	vector_iter<T>::operator=(vector_iter<T> const & rhs)
-	{
-		if (this != &rhs)
-			this->_v = rhs._v;
-		return (*this);
-	}
-
-	template< typename T >
-	bool	vector_iter<T>::operator!=(vector_iter<T> const & rhs) const
-	{
-		return (this->_v != rhs._v);
-	}
-
-	template< typename T >
-	bool	vector_iter<T>::operator==(vector_iter<T> const & rhs) const
-	{
-		return (this->_v == rhs._v);
-	}
+public:
 
 	/*
-	**	We do not have access to the inner vector array, instead,
-	**	we have access to the vector interface which provides
-	**	operator[] and at() to access elements by index.
+	**	Types for iterator_traits
+	**
+	**	Including these types is the modern way of writing iterators,
+	**	instead of inheriting from std::iterator.
+	**	Iterator tags are used by <algorithm> functions to determine the
+	**	most efficient algorithm to use.
 	*/
-	template< typename T >
-	typename vector_iter<T>::reference	vector_iter<T>::operator*(void) const
-	{
-		return (*(this->_v));
-	}
+	typedef T								value_type;
 
-	template< typename T >
-	typename vector_iter<T>::pointer	vector_iter<T>::operator->(void) const
-	{
-		return (this->_v);
-	}
+	/*
+	**	SFINAE WILL SELECT THE RIGHT reference AND pointer
+	**	BY USING THE choose STRUCTURE
+	*/
+	typedef	typename choose<IsConst, const T*, T*>::type	pointer;
+	typedef typename choose<IsConst, const T&, T&>::type	reference;
 
-	template< typename T >
-	vector_iter<T> &	vector_iter<T>::operator++(void)
-	{
-		this->_v += 1;
-		return (*this);
-	}
+	typedef std::size_t						size_type;
+	typedef	ptrdiff_t						difference_type;
+	typedef std::random_access_iterator_tag	iterator_category;
 
-	template< typename T >
-	vector_iter<T>	vector_iter<T>::operator++(int)
-	{
-		vector_iter<T>	prev(*this);
+	//Default constructor
+	vector_iter<T, IsConst>(void);
+	explicit vector_iter<T, IsConst>(pointer v);
 
-		this->_v += 1;
-		return (prev);
-	}
+	/*
+	**	SFINAE WILL ONLY ALLOW COPYING FROM A NON-CONST src TO
+	**	CONST ITERATOR, AND FROM CONST src TO CONST ITERATOR.
+	*/
+	template<bool WasConst>
+	vector_iter<T, IsConst>(vector_iter<T, WasConst> const & src,
+		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
+	
+	~vector_iter(void);
 
-	template< typename T >
-	vector_iter<T> &	vector_iter<T>::operator--(void)
-	{
-		this->_v -= 1;
-		return (*this);
-	}
+	/*
+	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
+	**	FROM const_iterator.
+	*/
+	vector_iter<T, IsConst> &	operator=(vector_iter<T, false> const & rhs);
 
-	template< typename T >
-	vector_iter<T>	vector_iter<T>::operator--(int)
-	{
-		vector_iter<T>	prev(*this);
+	bool						operator!=(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator==(vector_iter<T, IsConst> const & rhs) const;
+	reference					operator*(void) const;
+	pointer						operator->(void) const;
+	vector_iter<T, IsConst> &	operator++(void);
+	vector_iter<T, IsConst>		operator++(int);
+	vector_iter<T, IsConst> &	operator--(void);
+	vector_iter<T, IsConst>		operator--(int);
+	vector_iter<T, IsConst>		operator+(difference_type offset) const;
+	vector_iter<T, IsConst>		operator-(difference_type offset) const;
+	difference_type				operator-(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator<(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator>(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator<=(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator>=(vector_iter<T, IsConst> const & rhs) const;
+	vector_iter<T, IsConst> &	operator+=(difference_type offset);
+	vector_iter<T, IsConst> &	operator-=(difference_type offset);
+	reference					operator[](difference_type offset) const;
 
-		this->_v -= 1;
-		return (prev);
-	}
+private:
 
-	template< typename T >
-	vector_iter<T>	vector_iter<T>::operator+(difference_type offset) const
-	{
-		vector_iter<T>	res(this->_v + offset);
+	//In order to access private members of const from non const.
+	friend class	vector_iter<T, true>;
 
-		return (res);
-	}
+	pointer	_v;
 
-	template< typename T >
-	vector_iter<T>	vector_iter<T>::operator-(difference_type offset) const
-	{
-		vector_iter<T>	res(this->_v - offset);
+};
 
-		return (res);
-	}
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>::vector_iter(void) : _v(0)
+{
+	return ;
+}
 
-	template< typename T >
-	typename vector_iter<T>::difference_type
-		vector_iter<T>::operator-(vector_iter<T> const & rhs) const
-	{
-		return (this->_v - rhs._v);
-	}
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>::vector_iter(pointer v) : _v(v)
+{
+	return ;
+}
 
-	template< typename T >
-	bool	vector_iter<T>::operator<(vector_iter<T> const & rhs) const
-	{
-		return (this->_v < rhs._v);
-	}
+template< typename T, bool IsConst >
+template< bool WasConst >
+vector_iter<T, IsConst>::vector_iter(vector_iter<T, WasConst> const & src,
+	typename ft::enable_if<IsConst || !WasConst>::type *) : _v(0)
+{
+	*this = src;
+	return ;
+}
 
-	template< typename T >
-	bool	vector_iter<T>::operator>(vector_iter<T> const & rhs) const
-	{
-		return (this->_v > rhs._v);
-	}
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>::~vector_iter(void)
+{
+	return ;
+}
 
-	template< typename T >
-	bool	vector_iter<T>::operator<=(vector_iter<T> const & rhs) const
-	{
-		return (this->_v <= rhs._v);
-	}
+/*
+**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
+**	FROM const_iterator.
+*/
+template< typename T, bool IsConst >
+vector_iter<T, IsConst> &
+	vector_iter<T, IsConst>::operator=(vector_iter<T, false> const & rhs)
+{
+	this->_v = rhs._v;
+	return (*this);
+}
 
-	template< typename T >
-	bool	vector_iter<T>::operator>=(vector_iter<T> const & rhs) const
-	{
-		return (this->_v >= rhs._v);
-	}
+template< typename T, bool IsConst >
+bool	vector_iter<T, IsConst>::operator!=(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v != rhs._v);
+}
 
-	template< typename T >
-	vector_iter<T> &	vector_iter<T>::operator+=(difference_type offset)
-	{
-		this->_v += offset;
-		return (*this);
-	}
+template< typename T, bool IsConst >
+bool	vector_iter<T, IsConst>::operator==(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v == rhs._v);
+}
 
-	template< typename T >
-	vector_iter<T> &	vector_iter<T>::operator-=(difference_type offset)
-	{
-		this->_v -= offset;
-		return (*this);
-	}
+/*
+**	We do not have access to the inner vector array, instead,
+**	we have access to the vector interface which provides
+**	operator[] and at() to access elements by index.
+*/
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::reference
+	vector_iter<T, IsConst>::operator*(void) const
+{
+	return (*(this->_v));
+}
 
-	template< typename T >
-	typename vector_iter<T>::reference
-		vector_iter<T>::operator[](difference_type offset) const
-	{
-		return (*(this->_v + offset));
-	}
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::pointer
+	vector_iter<T, IsConst>::operator->(void) const
+{
+	return (this->_v);
+}
 
+template< typename T, bool IsConst >
+vector_iter<T, IsConst> &	vector_iter<T, IsConst>::operator++(void)
+{
+	this->_v += 1;
+	return (*this);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>	vector_iter<T, IsConst>::operator++(int)
+{
+	vector_iter<T, IsConst>	prev(*this);
+
+	this->_v += 1;
+	return (prev);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst> &	vector_iter<T, IsConst>::operator--(void)
+{
+	this->_v -= 1;
+	return (*this);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>	vector_iter<T, IsConst>::operator--(int)
+{
+	vector_iter<T, IsConst>	prev(*this);
+
+	this->_v -= 1;
+	return (prev);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>
+	vector_iter<T, IsConst>::operator+(difference_type offset) const
+{
+	vector_iter<T, IsConst>	res(this->_v + offset);
+
+	return (res);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>
+	vector_iter<T, IsConst>::operator-(difference_type offset) const
+{
+	vector_iter<T, IsConst>	res(this->_v - offset);
+
+	return (res);
+}
+
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::difference_type
+	vector_iter<T, IsConst>::operator-(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v - rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator<(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v < rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator>(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v > rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator<=(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v <= rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator>=(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v >= rhs._v);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst> &
+	vector_iter<T, IsConst>::operator+=(difference_type offset)
+{
+	this->_v += offset;
+	return (*this);
+}
+
+template< typename T, bool IsConst >
+vector_iter<T, IsConst> &
+vector_iter<T, IsConst>::operator-=(difference_type offset)
+{
+	this->_v -= offset;
+	return (*this);
+}
+
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::reference
+	vector_iter<T, IsConst>::operator[](difference_type offset) const
+{
+	return (*(this->_v + offset));
 }
 
 #endif
