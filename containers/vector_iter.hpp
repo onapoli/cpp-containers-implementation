@@ -83,6 +83,7 @@ public:
 	vector_iter<T, IsConst> &	operator--(void);
 	vector_iter<T, IsConst>		operator--(int);
 	vector_iter<T, IsConst>		operator+(difference_type offset) const;
+	difference_type				operator+(vector_iter<T, IsConst> const & rhs) const;
 	vector_iter<T, IsConst>		operator-(difference_type offset) const;
 	difference_type				operator-(vector_iter<T, IsConst> const & rhs) const;
 	bool						operator<(vector_iter<T, IsConst> const & rhs) const;
@@ -211,6 +212,13 @@ vector_iter<T, IsConst>
 	vector_iter<T, IsConst>	res(this->_v + offset);
 
 	return (res);
+}
+
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::difference_type
+	vector_iter<T, IsConst>::operator+(vector_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v + rhs._v);
 }
 
 template< typename T, bool IsConst >
