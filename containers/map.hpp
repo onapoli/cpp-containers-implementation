@@ -253,12 +253,10 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::begin(void) const
 	{
-		TreeNode<Key, T> *	node;
+		iterator	it;
 
-		node = this->_root;
-		while (node->getLeft())
-			node = node->getLeft();
-		return (const_iterator(node));
+		it = this->begin();
+		return (const_iterator(it));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -280,15 +278,10 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::end(void) const
 	{
-		TreeNode<Key, T> *	node;
-		iterator			it;
+		iterator	it;
 
-		node = this->_root;
-		while (node->getRight())
-			node = node->getRight();
-		it = const_iterator(node);
-		++it;
-		return (it);
+		it = this->end();
+		return (const_iterator(it));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
