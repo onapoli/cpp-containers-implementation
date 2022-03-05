@@ -11,6 +11,7 @@
 # include "../type_traits/type_traits.hpp"
 # include "../iterator/iterator.hpp"
 # include "map_iter.hpp"
+# include "map_rev_iter.hpp"
 # include "TreeNode.hpp"
 
 namespace	ft
@@ -64,9 +65,8 @@ namespace	ft
 		typedef	typename allocator_type::const_pointer		const_pointer;
 		typedef	map_iter<Key, T, false, Compare, Alloc>		iterator;
 		typedef	map_iter<Key, T, true, Compare, Alloc>		const_iterator;
-		typedef ft::reverse_iterator<iterator>				reverse_iterator;
-		/*typedef ft::reverse_iterator<iterator, true>
-			const_reverse_iterator;*/
+		typedef map_rev_iter<Key, T, false, Compare, Alloc>	reverse_iterator;
+		typedef map_rev_iter<Key, T, true, Compare, Alloc>	const_reverse_iterator;
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
 
@@ -91,9 +91,9 @@ namespace	ft
 		iterator					end(void);
 		const_iterator				end(void) const;
 		reverse_iterator			rbegin(void);
-		//const_reverse_iterator		rbegin(void) const;
+		const_reverse_iterator		rbegin(void) const;
 		reverse_iterator			rend(void);
-		//const_reverse_iterator		rend(void) const;
+		const_reverse_iterator		rend(void) const;
 	
 		//Capacity
 		bool						empty(void) const;
@@ -303,7 +303,18 @@ namespace	ft
 			node = node->getRight();
 		it = iterator(node);
 		++it;
-		return (reverse_iterator(it));
+		return (reverse_iterator(it.getNode(), it.getEndOffset(),
+			it.getBeginOffset()));
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
+		map<Key, T, Compare, Alloc>::rbegin(void) const
+	{
+		reverse_iterator	rit;
+		
+		rit = this->rbegin();
+		return (const_reverse_iterator(rit));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -317,8 +328,18 @@ namespace	ft
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		//--it;
-		return (reverse_iterator(it));
+		return (reverse_iterator(it.getNode(), it.getEndOffset(),
+			it.getBeginOffset()));
+	}
+
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
+		map<Key, T, Compare, Alloc>::rend(void) const
+	{
+		reverse_iterator	rit;
+		
+		rit = this->rend();
+		return (const_reverse_iterator(rit));
 	}
 
 	//Capacity

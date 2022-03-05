@@ -1,7 +1,8 @@
 #ifndef MAP_ITER_H
 # define MAP_ITER_H
 
-# include <cstddef>
+# include <cstddef> // TO GET std::size_t, ptrdiff_t ...
+# include <iterator> // TO GET iterator_category
 
 # include "TreeNode.hpp"
 # include "../type_traits/type_traits.hpp"
@@ -51,10 +52,10 @@ public:
 	**	BY USING THE choose STRUCTURE
 	*/
 	typedef typename choose<IsConst,
-		typename allocator_type::reference const,
+		typename allocator_type::const_reference,
 		typename allocator_type::reference>::type	reference;
 	typedef typename choose<IsConst,
-		typename allocator_type::pointer const,
+		typename allocator_type::const_pointer,
 		typename allocator_type::pointer>::type		pointer;
 	
 	typedef std::size_t								size_type;
@@ -64,7 +65,8 @@ public:
 	typedef TreeNode<Key, T>						node;
 
 	map_iter(void);
-	explicit map_iter(node * n);
+	explicit map_iter(node * n, size_type end_offset = 0,
+		size_type begin_offset = 0);
 
 	/*
 	**	SFINAE WILL ONLY ALLOW COPYING FROM A NON-CONST src TO
@@ -93,6 +95,10 @@ public:
 	map_iter	operator--(int);
 
 	node *		getNode(void) const;
+	size_type	getEndOffset(void) const;
+	size_type	getBeginOffset(void) const;
+	void		setEndOffset(size_type offset);
+	void		setBeginOffset(size_type offset);
 
 private:
 
@@ -119,8 +125,10 @@ map_iter<Key, T, IsConst, Compare, Alloc>::map_iter(void)
 
 template< typename Key, typename T, bool IsConst,
 	typename Compare, typename Alloc >
-map_iter<Key, T, IsConst, Compare, Alloc>::map_iter(node * n)
-	: _comp(key_compare()), _node(n), _end_offset(0), _begin_offset(0)
+map_iter<Key, T, IsConst, Compare, Alloc>::map_iter(node * n,
+	size_type end_offset, size_type begin_offset)
+	: _comp(key_compare()), _node(n), _end_offset(end_offset),
+	_begin_offset(begin_offset)
 {
 	return ;
 }
@@ -320,6 +328,40 @@ typename map_iter<Key, T, IsConst, Compare, Alloc>::node *
 	map_iter<Key, T, IsConst, Compare, Alloc>::getNode(void) const
 {
 	return (this->_node);
+}
+
+template< typename Key, typename T, bool IsConst,
+	typename Compare, typename Alloc >
+typename map_iter<Key, T, IsConst, Compare, Alloc>::size_type
+	map_iter<Key, T, IsConst, Compare, Alloc>::getEndOffset(void) const
+{
+	return (this->_end_offset);
+}
+
+template< typename Key, typename T, bool IsConst,
+	typename Compare, typename Alloc >
+typename map_iter<Key, T, IsConst, Compare, Alloc>::size_type
+	map_iter<Key, T, IsConst, Compare, Alloc>::getBeginOffset(void) const
+{
+	return (this->_begin_offset);
+}
+
+template< typename Key, typename T, bool IsConst,
+	typename Compare, typename Alloc >
+void
+	map_iter<Key, T, IsConst, Compare, Alloc>::setEndOffset(size_type offset)
+{
+	this->_end_offset = offset;
+	return ;
+}
+
+template< typename Key, typename T, bool IsConst,
+	typename Compare, typename Alloc >
+void
+	map_iter<Key, T, IsConst, Compare, Alloc>::setBeginOffset(size_type offset)
+{
+	this->_begin_offset = offset;
+	return ;
 }
 
 #endif
