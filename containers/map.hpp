@@ -13,6 +13,7 @@
 # include "map_iter.hpp"
 # include "map_rev_iter.hpp"
 # include "TreeNode.hpp"
+# include "../algorithm/algorithm.hpp"
 
 namespace	ft
 {
@@ -256,10 +257,16 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::begin(void) const
 	{
-		iterator	it;
+		/*iterator	it;
 
 		it = this->begin();
-		return (const_iterator(it));
+		return (const_iterator(it));*/
+		tree_node *	node;
+
+		node = this->_root;
+		while (node->getLeft())
+			node = node->getLeft();
+		return (const_iterator(node));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -281,10 +288,19 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::end(void) const
 	{
-		iterator	it;
+		/*iterator	it;
 
 		it = this->end();
-		return (const_iterator(it));
+		return (const_iterator(it));*/
+		tree_node *	node;
+		const_iterator			it;
+
+		node = this->_root;
+		while (node->getRight())
+			node = node->getRight();
+		it = const_iterator(node);
+		++it;
+		return (it);
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -1201,6 +1217,60 @@ namespace	ft
             this->_printTree(node->getLeft(), space);
         }
     }
+
+	// Non_Member functions
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator==(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs )
+	{
+		if (lhs.size() != rhs.size())
+			return (false);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator!=(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs)
+	{
+		return (!(lhs == rhs));
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator<(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+			rhs.begin(), rhs.end(), lhs.value_comp()));
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator<=(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs)
+	{
+		return (!(rhs < lhs));
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator>(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs)
+	{
+		return (rhs < lhs);
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	bool	operator>=(map<Key,T,Compare,Alloc> const & lhs,
+				map<Key,T,Compare,Alloc> const & rhs)
+	{
+		return (!(lhs < rhs));
+	}
+
+	template < typename Key, typename T, typename Compare, typename Alloc >
+	void	swap(map<Key,T,Compare,Alloc>& x, map<Key,T,Compare,Alloc>& y)
+	{
+		x.swap(y);
+		return ;
+	}
 
 }
 
