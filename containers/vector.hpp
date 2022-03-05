@@ -5,6 +5,7 @@
 # include <cstddef>
 
 # include "vector_iter.hpp"
+# include "vector_rev_iter.hpp"
 # include "../iterator/iterator.hpp"
 # include "../type_traits/type_traits.hpp"
 # include "../algorithm/algorithm.hpp"
@@ -21,18 +22,18 @@ namespace	ft
 	public:
 
 		// Member Types
-		typedef T										value_type;
-		typedef	T*										pointer;
-		typedef T&										reference;
-		typedef	T const*								const_pointer;
-		typedef T const&								const_reference;
-		typedef Alloc									allocator_type;
-		typedef std::size_t								size_type;
-		typedef	ptrdiff_t								difference_type;
-		typedef vector_iter<T, false>					iterator;
-		typedef vector_iter<T, true>					const_iterator;
-		typedef ft::reverse_iterator<iterator>			reverse_iterator;
-		typedef ft::reverse_iterator<const iterator>	const_reverse_iterator;
+		typedef T							value_type;
+		typedef	T*							pointer;
+		typedef T&							reference;
+		typedef	T const*					const_pointer;
+		typedef T const&					const_reference;
+		typedef Alloc						allocator_type;
+		typedef std::size_t					size_type;
+		typedef	ptrdiff_t					difference_type;
+		typedef vector_iter<T, false>		iterator;
+		typedef vector_iter<T, true>		const_iterator;
+		typedef vector_rev_iter<T, false>	reverse_iterator;
+		typedef vector_rev_iter<T, true>	const_reverse_iterator;
 
 		// Member Functions
 
@@ -302,9 +303,9 @@ namespace	ft
 	typename vector< T, Alloc >::reverse_iterator
 		vector< T, Alloc >::rbegin(void)
 	{
-		iterator	it(this->_content + this->_size);
+		reverse_iterator	rit(this->_content + this->_size);
 
-		return (reverse_iterator(it));
+		return (rit);
 	}
 
 	template< typename T, typename Alloc >
@@ -314,7 +315,6 @@ namespace	ft
 		reverse_iterator	rit;
 		
 		rit = this->rbegin();
-
 		return (const_reverse_iterator(rit));
 	}
 
@@ -322,9 +322,9 @@ namespace	ft
 	typename vector< T, Alloc >::reverse_iterator
 		vector< T, Alloc >::rend(void)
 	{
-		iterator	it(this->_content);
+		reverse_iterator	rit(this->_content);
 
-		return (reverse_iterator(it));
+		return (rit);
 	}
 
 	template< typename T, typename Alloc >
