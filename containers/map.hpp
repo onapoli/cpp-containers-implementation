@@ -230,6 +230,8 @@ namespace	ft
 	{
 		if (this != &rhs)
 		{
+			if (!this->empty())
+				this->clear();
 			this->_alloc = rhs._alloc;
 			this->_comp = rhs._comp;
 			//DEEP COPY
