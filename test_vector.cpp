@@ -205,6 +205,44 @@ void	rev_iter(void)
 	return ;
 }
 
+void	rev_const(void)
+{
+	std::cout << "\n\n--- REVERSE CONST TESTS ---\n";
+	ft::vector<int>						v(5, 0);
+	std::size_t							i;
+	ft::vector<int>::iterator			it;
+	ft::vector<int>::reverse_iterator		rit;
+	ft::vector<int>::const_reverse_iterator	crit(rit);
+	int									counter;
+	int									base_counter;
+
+	i = 0;
+	for (it = v.begin(); it != v.end(); ++it)
+		*it = i++;
+	std::cout << "The first dereference of rit.base()";
+	std::cout << " will generate an invalid read WARNING";
+	std::cout << " in memory inspector." << "\n";
+	counter = 4;
+	base_counter = 5;
+	rit = v.rbegin();
+	*rit = 4;
+	for (crit = v.rbegin(); crit != v.rend(); ++crit)
+	{
+		std::cout << "value: " << *crit << " base: " << *(crit.base()) << "\n";
+		if (counter == 4)
+		{
+			// COMPILATION ERROR. crit IS CONST
+			// *crit = 2;
+			assert(*crit == counter && *(crit.base()) == 0);
+		}
+		else
+			assert(*crit == counter && *(crit.base()) == base_counter);
+		--counter;
+		--base_counter;
+	}
+	std::cout << "\nREVERSE CONST TESTS: OK\n";
+}
+
 void	modifier_assign(void)
 {
 	ft::vector<int>	v;
@@ -367,6 +405,7 @@ int	main(void)
 	iterator_constness();
 	iter_traits();
 	rev_iter();
+	rev_const();
 	modifier_assign();
 	modifier_push_pop_back();
 	modifier_insert();
