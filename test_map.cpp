@@ -17,9 +17,15 @@ void	construction(void)
 	assert(m.size() == 1);
 	m.insert(ft::make_pair<int, std::string>(1, "bye"));
 	assert(m.size() == 2);
-	ft::map<int, std::string>	m2(m.begin(), m.end());
+	ft::map<int, std::string>	m2(m);
 	assert(m2.size() == 2);
 	assert(m2.begin()->first == 1);
+	m2.begin()->second = "adios";
+	assert(m2.begin()->second == "adios");
+	assert(m.begin()->second == "bye");
+	ft::map<int, std::string>	m3(m.begin(), m.end());
+	assert(m3.size() == 2);
+	assert(m3.begin()->first == 1);
 	it = m.begin();
 	++it;
 	assert(it->first == 5);
