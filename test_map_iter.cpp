@@ -102,6 +102,11 @@ void	reverse(void)
 	m.insert(ft::pair<int, int>(1, 1));
 	m.insert(ft::pair<int, int>(2, 2));
 	m.insert(ft::pair<int, int>(3, 3));
+	rit = m.rbegin();
+	//COMPILATION ERROR. KEYS CANNOT BE MODIFIED. THEY ARE CONST
+	//rit->first = 3;
+	rit->second = 3;
+	(*rit).second = 3;
 	counter = 3;
 	for (rit = m.rbegin(); rit != m.rend(); ++rit)
 	{
@@ -127,8 +132,10 @@ void	reverse_constness(void)
 	m.insert(ft::pair<int, int>(10, 10));
 	m.insert(ft::pair<int, int>(20, 20));
 	rit = m.rbegin();
-	//COMPILATION ERROR, AS IN std::map. NOT SURE WHY
-	//*rit = ft::pair<int, int>(10, 10);
+	//COMPILATION ERROR. KEYS CANNOT BE MODIFIED. THEY ARE CONST
+	//rit->first = 20;
+	rit->second = 20;
+	(*rit).second = 20;
 	crit = rit;
 	rit2 = rit;
 	//COMPILATION ERROR, AS iterator CANNOT BE ASSIGNED const_iterator
