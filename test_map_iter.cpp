@@ -105,13 +105,42 @@ void	reverse(void)
 	counter = 3;
 	for (rit = m.rbegin(); rit != m.rend(); ++rit)
 	{
-		std::cout << rit->first << std::endl;
 		assert(rit->first == counter);
 		--counter;
 	}
 	// COMPILATION ERROR: INVALID OPERANDS FOR bidirectional iterator
 	//assert( (rit < m.rbegin()) == false );
 	std::cout << "\nREVERSE TESTS: OK\n";
+	return ;
+}
+
+void	reverse_constness(void)
+{
+	ft::map<int, int>							m;
+	ft::map<int, int>::reverse_iterator			rit;
+	ft::map<int, int>::const_reverse_iterator	crit(rit);
+	//COMPILATION ERROR, AS iterator CANNOT COPY const_iterator
+	//ft::map<int, int>::iterator				rit2(crit);
+	ft::map<int, int>::reverse_iterator			rit2;
+	int											counter;
+
+	m.insert(ft::pair<int, int>(10, 10));
+	m.insert(ft::pair<int, int>(20, 20));
+	rit = m.rbegin();
+	//COMPILATION ERROR, AS IN std::map. NOT SURE WHY
+	//*rit = ft::pair<int, int>(10, 10);
+	crit = rit;
+	rit2 = rit;
+	//COMPILATION ERROR, AS iterator CANNOT BE ASSIGNED const_iterator
+	//rit = crit;
+	counter = 20;
+	for (crit = m.rbegin(); crit != m.rend(); ++crit)
+	{
+		//COMPILATION ERROR, AS crit IS CONST
+		//*crit = ft::pair<int, int>(2, 2);
+		assert(counter == crit->first);
+		counter -= 10;
+	}
 	return ;
 }
 
@@ -122,6 +151,7 @@ int	main(void)
 	comparison();
 	constness();
 	reverse();
+	reverse_constness();
 	std::cout << std::endl;
 	return (0);
 }
