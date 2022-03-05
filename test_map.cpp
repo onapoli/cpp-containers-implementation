@@ -289,6 +289,46 @@ void	equal_range(void)
 	return ;
 }
 
+void	non_member_swap()
+{
+	ft::map<int, std::string>	m;
+	ft::map<int, std::string>	n;
+
+	m.insert(ft::make_pair<int, std::string>(5, "hello"));
+	n.insert(ft::make_pair<int, std::string>(10, "bye"));
+	n.insert(ft::make_pair<int, std::string>(15, "au revoir"));
+	ft::swap(m, n);
+	assert(m.size() == 2);
+	assert(n.size() == 1);
+	assert(m.begin()->first == 10 && m.begin()->second == "bye");
+	assert(n.begin()->first == 5 && n.begin()->second == "hello");
+	std::cout << "\nNON-MEMBER SWAP TESTS: OK\n";
+	return ;
+}
+
+void	non_member_relational()
+{
+	ft::map<int, std::string>	m;
+	ft::map<int, std::string>	n;
+
+	m.insert(ft::make_pair<int, std::string>(5, "hello"));
+	n.insert(ft::make_pair<int, std::string>(10, "bye"));
+	n.insert(ft::make_pair<int, std::string>(15, "au revoir"));
+	assert( (m < n) == true);
+	assert( (m > n) == false);
+	assert( (m >= n) == false);
+	assert( (m <= n) == true);
+	assert( (m == n) == false);
+	assert( (m != n) == true);
+	n = m;
+	assert( (n == m) == true);
+	assert( (m == n) == true);
+	assert( (n != m) == false);
+	assert( (n <= m) == true);
+	assert( (n >= m) == true);
+	return ;
+}
+
 int	main(void)
 {
 	construction();
@@ -303,6 +343,8 @@ int	main(void)
 	find_count();
 	bounds();
 	equal_range();
+	non_member_swap();
+	non_member_relational();
 	std::cout << std::endl;
 	return (0);
 }
