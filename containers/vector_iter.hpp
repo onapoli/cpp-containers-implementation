@@ -56,7 +56,7 @@ public:
 
 	//Default constructor
 	vector_iter<T, IsConst>(void);
-	explicit vector_iter<T, IsConst>(pointer v);
+	vector_iter<T, IsConst>(pointer v);
 
 	/*
 	**	SFINAE WILL ONLY ALLOW COPYING FROM A NON-CONST src TO
@@ -93,6 +93,8 @@ public:
 	vector_iter<T, IsConst> &	operator+=(difference_type offset);
 	vector_iter<T, IsConst> &	operator-=(difference_type offset);
 	reference					operator[](difference_type offset) const;
+
+	pointer						getContent(void) const;
 
 private:
 
@@ -286,6 +288,13 @@ typename vector_iter<T, IsConst>::reference
 	vector_iter<T, IsConst>::operator[](difference_type offset) const
 {
 	return (*(this->_v + offset));
+}
+
+template< typename T, bool IsConst >
+typename vector_iter<T, IsConst>::pointer
+	vector_iter<T, IsConst>::getContent(void) const
+{
+	return (this->_v);
 }
 
 #endif

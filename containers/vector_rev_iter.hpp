@@ -3,6 +3,8 @@
 
 # include <iterator> // TO GET iterator_category
 
+# include "vector_iter.hpp"
+
 /*
 **	VECTOR REVERSE ITERATOR class DECLARATION
 */
@@ -36,7 +38,7 @@ public:
 	typedef std::random_access_iterator_tag					iterator_category;
 
 	vector_rev_iter<T, IsConst>(void);
-	explicit vector_rev_iter<T, IsConst>(pointer v);
+	vector_rev_iter<T, IsConst>(pointer v);
 	
 	/*
 	**	SFINAE WILL ONLY ALLOW COPYING FROM A NON-CONST src TO
@@ -45,6 +47,8 @@ public:
 	template< bool WasConst >
 	vector_rev_iter<T, IsConst>(vector_rev_iter<T, WasConst> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
+	
+	explicit vector_rev_iter(vector_iter<T, false> const & src);
 	
 	/*
 	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
@@ -62,6 +66,7 @@ public:
 	vector_rev_iter 	operator-(difference_type n) const;
 	vector_rev_iter& 	operator--(void);
 	vector_rev_iter  	operator--(int);
+	vector_rev_iter&	operator-=(difference_type n);
 	pointer 			operator->(void) const;
 	reference 			operator[](difference_type n) const;
 
@@ -93,6 +98,13 @@ template< bool WasConst >
 vector_rev_iter<T, IsConst>::vector_rev_iter(
 	vector_rev_iter<T, WasConst> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type *) : _v(src._v)
+{
+	return ;
+}
+
+template< typename T, bool IsConst >
+vector_rev_iter<T, IsConst>::vector_rev_iter(vector_iter<T, false> const & src)
+	: _v(src.getContent() + 1)
 {
 	return ;
 }
@@ -179,6 +191,14 @@ vector_rev_iter<T, IsConst>	vector_rev_iter<T, IsConst>::operator--(int)
 
 	--(*this);
 	return (prev);
+}
+
+template< typename T, bool IsConst >
+vector_rev_iter<T, IsConst> &
+	vector_rev_iter<T, IsConst>::operator-=(difference_type n)
+{
+	this->_v += n;
+	return (*this);
 }
 
 template< typename T, bool IsConst >
