@@ -24,7 +24,15 @@ namespace	ft
 			reference;
 
 		reverse_iterator<Iterator>(void);
-		explicit reverse_iterator<Iterator>(iterator_type it);
+		/*
+		**	THE std VERSION IS:
+		**
+		**	explicit reverse_iterator<Iterator>(iterator_type it);
+		**
+		**	BUT SOME TESTS WITH IMPLICIT CONVERSIONS DO NOT PASS
+		**	WITH explicit AND CANNOT FIGURE OUT AN ALTERNATIVE WAY.
+		*/
+		reverse_iterator<Iterator>(iterator_type it);
 		//copy constructor function template
 		template< typename Iter >
 		reverse_iterator<Iterator>(reverse_iterator<Iter> const & rev_it);
