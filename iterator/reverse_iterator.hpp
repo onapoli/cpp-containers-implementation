@@ -38,6 +38,7 @@ namespace	ft
 		reverse_iterator 	operator-(difference_type n) const;
 		reverse_iterator& 	operator--(void);
 		reverse_iterator  	operator--(int);
+		reverse_iterator&	operator-=(difference_type n);
 		pointer 			operator->(void) const;
 		reference 			operator[](difference_type n) const;
 
@@ -137,6 +138,14 @@ namespace	ft
 
 		--(*this);
 		return (prev);
+	}
+
+	template< typename Iterator >
+	reverse_iterator<Iterator> &
+		reverse_iterator<Iterator>::operator-=(difference_type n)
+	{
+		this->_it += n;
+		return (*this);
 	}
 
 	template< typename Iterator >
