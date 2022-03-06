@@ -70,8 +70,10 @@ public:
 	pointer 			operator->(void) const;
 	reference 			operator[](difference_type n) const;
 
-	bool				operator!=(vector_rev_iter<T, IsConst> const & rhs) const;
-	bool				operator==(vector_rev_iter<T, IsConst> const & rhs) const;
+	bool
+		operator!=(vector_rev_iter<T, IsConst> const & rhs) const;
+	bool
+		operator==(vector_rev_iter<T, IsConst> const & rhs) const;
 
 private:
 
@@ -215,6 +217,22 @@ typename vector_rev_iter<T, IsConst>::reference
 	return (this->_v[-n-1]);
 }
 
+template< typename T, bool IsConst >
+bool
+	vector_rev_iter<T, IsConst>::operator!=(
+		vector_rev_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v != rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_rev_iter<T, IsConst>::operator==(
+		vector_rev_iter<T, IsConst> const & rhs) const
+{
+	return (this->_v == rhs._v);
+}
+
 // NON-MEMBER functions
 
 template < typename T, bool IsConst >
@@ -273,18 +291,6 @@ typename vector_rev_iter<T, IsConst>::difference_type
 	const vector_rev_iter<T, IsConst>& rhs)
 {
 	return (rhs.base() - lhs.base());
-}
-
-template< typename T, bool IsConst >
-bool	vector_rev_iter<T, IsConst>::operator!=(vector_rev_iter<T, IsConst> const & rhs) const
-{
-	return (this->_v != rhs._v);
-}
-
-template< typename T, bool IsConst >
-bool	vector_rev_iter<T, IsConst>::operator==(vector_rev_iter<T, IsConst> const & rhs) const
-{
-	return (this->_v == rhs._v);
 }
 
 #endif
