@@ -43,10 +43,10 @@ namespace	ft
 
 		for (it1 = first1, it2 = first2; it1 != last1; ++it1, ++it2)
 		{
-			if (*it1 < *it2)
-				return (true);
 			if (it2 == last2 || *it2 < *it1)
 				return (false);
+			if (*it1 < *it2)
+				return (true);
 		}
 		return (it2 != last2);
 	}
@@ -61,10 +61,10 @@ namespace	ft
 
 		for (it1 = first1, it2 = first2; it1 != last1; ++it1, ++it2)
 		{
-			if (comp(*it1, *it2))
-				return (true);
 			if (it2 == last2 || comp(*it2, *it1))
 				return (false);
+			if (comp(*it1, *it2))
+				return (true);
 		}
 		return (it2 != last2);
 	}
