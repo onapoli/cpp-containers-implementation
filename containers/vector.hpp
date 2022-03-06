@@ -186,7 +186,7 @@ namespace	ft
 	vector< T, Alloc >::vector(allocator_type const & alloc) : _alloc(alloc),
 		_content(0), _size(0), _capacity(0)
 	{
-		std::cout << "vector default Constructor called" << std::endl;
+		//std::cout << "vector default Constructor called" << std::endl;
 		return ;
 	}
 
@@ -195,7 +195,7 @@ namespace	ft
 		allocator_type const & alloc) : _alloc(alloc), _content(0),
 		_size(n), _capacity(n)
 	{
-		std::cout << "vector fill Constructor called" << std::endl;
+		//std::cout << "vector fill Constructor called" << std::endl;
 		this->_allocate_content(this->_capacity, val);
 		return ;
 	}
@@ -210,7 +210,7 @@ namespace	ft
 	{
 		size_type	i;
 
-		std::cout << "vector range Constructor called" << std::endl;
+		//std::cout << "vector range Constructor called" << std::endl;
 		this->_allocate_content(this->_capacity);
 		for (i = 0; first + i != last; ++i)
 		{
@@ -230,7 +230,7 @@ namespace	ft
 	template< typename T, typename Alloc >
 	vector< T, Alloc >::~vector(void)
 	{
-		std::cout << "vector Destructor called" << std::endl;
+		//std::cout << "vector Destructor called" << std::endl;
 		this->_free_content();
 		return ;
 	}
@@ -492,7 +492,7 @@ namespace	ft
 	{
 		size_type	i;
 
-		std::cout << "ASSIGN RANGED CALLED" << std::endl;
+		//std::cout << "ASSIGN RANGED CALLED" << std::endl;
 		this->_free_content();
 		this->_size = last - first;
 		this->_capacity = this->_size;
