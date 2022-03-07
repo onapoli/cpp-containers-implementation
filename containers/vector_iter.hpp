@@ -297,4 +297,20 @@ typename vector_iter<T, IsConst>::pointer
 	return (this->_v);
 }
 
+template< typename T, bool IsConst >
+vector_iter<T, IsConst>
+	operator+(typename vector_iter<T, IsConst>::difference_type offset,
+		vector_iter<T, IsConst> const & rhs)
+{
+	return (rhs + offset);
+}
+
+template < typename T, bool IsConst >
+typename vector_iter<T, IsConst>::difference_type
+	operator-(vector_iter<T, IsConst> const & lhs,
+		vector_iter<T, IsConst> const & rhs)
+{
+	return (rhs.getContent() - lhs.getContent());
+}
+
 #endif
