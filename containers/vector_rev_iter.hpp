@@ -106,7 +106,7 @@ vector_rev_iter<T, IsConst>::vector_rev_iter(
 
 template< typename T, bool IsConst >
 vector_rev_iter<T, IsConst>::vector_rev_iter(vector_iter<T, false> const & src)
-	: _v(src.getContent() + 1)
+	: _v(src.getContent())
 {
 	return ;
 }
