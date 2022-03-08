@@ -34,32 +34,32 @@ namespace	ft
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr == rhs._ctnr);
-		};
+		}
 		friend bool	operator!=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr != rhs._ctnr);
-		};
+		}
 		friend bool	operator<(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr < rhs._ctnr);
-		};
+		}
 		friend bool	operator<=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr <= rhs._ctnr);
-		};
+		}
 		friend bool	operator>(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr > rhs._ctnr);
-		};
+		}
 		friend bool	operator>=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
 			return (lhs._ctnr >= rhs._ctnr);
-		};
+		}
 
 	private:
 		container_type	_ctnr;
