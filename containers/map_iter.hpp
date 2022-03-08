@@ -6,13 +6,14 @@
 
 # include "TreeNode.hpp"
 # include "../type_traits/type_traits.hpp"
+# include "choose.hpp"
 
 /*
 **	STRUCTURE TO SELECT THE RIGHT map_iter reference AND pointer TYPE
 **	THROUGH SFINAE AND PARTIAL TEMPLATE SPECIALIZATION.
 */
 
-template <bool flag, class IsTrue, class IsFalse>
+/*template <bool flag, class IsTrue, class IsFalse>
 struct choose;
 
 template <class IsTrue, class IsFalse>
@@ -23,7 +24,7 @@ struct choose<true, IsTrue, IsFalse> {
 template <class IsTrue, class IsFalse>
 struct choose<false, IsTrue, IsFalse> {
    typedef IsFalse type;
-};
+};*/
 
 
 /*

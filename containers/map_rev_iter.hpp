@@ -33,8 +33,8 @@ public:
 	**	SFINAE WILL SELECT THE RIGHT reference AND pointer
 	**	BY USING THE choose STRUCTURE
 	**
-	**	choose IS ALREADY DEFINED IN map_iter.hpp, SO IT IS NOT
-	**	NECESSARY TO REDEFINE IT IN THIS FILE.
+	**	choose IS ALREADY INCLUDED IN map_iter.hpp, SO IT IS NOT
+	**	NECESSARY TO INCLUDE IT IN THIS FILE.
 	*/
 	typedef typename choose<IsConst,
 		typename allocator_type::const_reference,

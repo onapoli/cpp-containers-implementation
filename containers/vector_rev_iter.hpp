@@ -28,7 +28,7 @@ public:
 	**	SFINAE WILL SELECT THE RIGHT reference AND pointer
 	**	BY USING THE choose STRUCTURE
 	**
-	**	choose IS DEFINED AT vector_iter.hpp
+	**	choose IS INCLUDED IN vector_iter.hpp
 	*/
 	typedef	typename choose<IsConst, const T*, T*>::type	pointer;
 	typedef typename choose<IsConst, const T&, T&>::type	reference;
