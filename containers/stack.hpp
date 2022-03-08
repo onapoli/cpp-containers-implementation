@@ -25,6 +25,42 @@ namespace	ft
 		void				push(value_type const & val);
 		void				pop(void);
 
+		//Non-Member functions
+		/*
+		**	DECLARED HERE TO ADD THE friend KEYWORD, THAT WILL
+		**	ALLOW BOTH stacks TO ACCESS ITS PRIVATE MEMBERS.
+		*/
+		friend bool	operator==(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr == rhs._ctnr);
+		};
+		friend bool	operator!=(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr != rhs._ctnr);
+		};
+		friend bool	operator<(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr < rhs._ctnr);
+		};
+		friend bool	operator<=(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr <= rhs._ctnr);
+		};
+		friend bool	operator>(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr > rhs._ctnr);
+		};
+		friend bool	operator>=(stack< T, Container > const & lhs,
+						stack< T, Container > const & rhs)
+		{
+			return (lhs._ctnr >= rhs._ctnr);
+		};
+
 	private:
 		container_type	_ctnr;
 	};
@@ -75,50 +111,6 @@ namespace	ft
 	{
 		this->_ctnr.pop_back();
 		return ;
-	}
-
-	// Non-member functions
-
-	template< typename T, typename Container >
-	bool	operator==(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr == rhs._ctnr);
-	}
-
-	template< typename T, typename Container >
-	bool	operator!=(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr != rhs._ctnr);
-	}
-
-	template< typename T, typename Container >
-	bool	operator<(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr < rhs._ctnr);
-	}
-
-	template< typename T, typename Container >
-	bool	operator<=(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr <= rhs._ctnr);
-	}
-
-	template< typename T, typename Container >
-	bool	operator>(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr > rhs._ctnr);
-	}
-
-	template< typename T, typename Container >
-	bool	operator>=(stack< T, Container > const & lhs,
-				stack< T, Container > const & rhs)
-	{
-		return (lhs._ctnr >= rhs._ctnr);
 	}
 
 }
