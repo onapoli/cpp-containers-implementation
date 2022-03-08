@@ -152,7 +152,7 @@ namespace	ft
 		void			_allocate_content(size_type n,
 							value_type val = value_type());
 		void			_free_content(void);
-		void			_modify_capacity(size_type new_cap,
+		void			_modify_capacity(size_type new_cap, size_type new_size,
 							value_type val = value_type());
 		void			_move_values_back(size_type from_index,
 							size_type positions);
@@ -211,10 +211,10 @@ namespace	ft
 		size_type	i;
 
 		//std::cout << "vector range Constructor called" << std::endl;
-		this->_allocate_content(this->_capacity);
+		this->_content = this->_alloc.allocate(this->_capacity);
 		for (i = 0; first + i != last; ++i)
 		{
-			this->_content[i] = *(first + i);
+			this->_alloc.construct(this->_content + i, *(first + i));
 		}
 		return ;
 	}
@@ -246,17 +246,26 @@ namespace	ft
 			if (this->_capacity != rhs._capacity)
 			{
 				this->_free_content();
-				this->_content = this->_alloc.allocate(rhs._capacity);
-				for (i = 0; i < rhs._size; ++i)
-					this->_alloc.construct(this->_content + i, rhs._content[i]);
-				for (; i < rhs._capacity; ++i)
-					this->_alloc.construct(this->_content + i, value_type());
+				if (rhs._capacity)
+				{
+					this->_content = this->_alloc.allocate(rhs._capacity);
+					for (i = 0; i < rhs._size; ++i)
+						this->_alloc.construct(this->_content + i, rhs._content[i]);
+				}
 				this->_capacity = rhs._capacity;
 			}
 			else
 			{
 				for (i = 0; i < rhs._size; ++i)
-					this->_content[i] = rhs._content[i];
+				{
+					if (i < this->_size)
+						this->_alloc.destroy(this->_content + i);
+					this->_alloc.construct(this->_content + i, rhs._content[i]);
+				}
+				for (; i < this->_size; ++i)
+				{
+					this->_alloc.destroy(this->_content + i);
+				}
 			}
 			this->_size = rhs._size;
 		}
@@ -369,28 +378,43 @@ namespace	ft
 	{
 		size_type	i;
 
-		//TEST CASE: n = 0
-
 		// Will reallocate memory if new size is greater than current capacity.
 		if (n > this->_capacity)
 			this->_modify_capacity(this->_size * 2 >= n
-				? this->_size * 2 : n, val);
+				? this->_size * 2 : n, n, val);
 		/*
 		** Will reallocate memory if n is more than 2 times lower than current
 		** capacity to optimize memory usage.
 		*/
 		else if (n < this->_capacity)
 		{
+			if (n < this->_size)
+			{
+				for (i = n; i < this->_size; ++i)
+				{
+					this->_alloc.destroy(this->_content + i);
+				}
+				this->_size = n;
+			}
 			if (static_cast<float>(this->_capacity) / static_cast<float>(n)
 				> static_cast<float>(2))
-				this->_modify_capacity(n * 2, val);
+			{
+				/*
+				**	FOR n = 0 IT ALSO ENTERS THIS BLOCK, DESPITE THE IMPOSSIBLE
+				**	DIVISION BY 0.
+				*/
+				this->_modify_capacity(n * 2, n, val);
+			}
 		}
 		/*
 		** If any memory reallocation was done, this->_size would be equal to n,
 		** and will not enter the for loop.
 		*/
-		for (i = this->_size; i < n; ++i)
-			this->_content[i] = val;
+		else
+		{
+			for (i = this->_size; i < n; ++i)
+				this->_alloc.construct(this->_content + i, val);
+		}
 		this->_size = n;
 		return ;
 	}
@@ -400,7 +424,7 @@ namespace	ft
 	{
 		if (n <= this->_capacity)
 			return ;
-		this->_modify_capacity(n);
+		this->_modify_capacity(n, this->_size);
 		return ;
 	}
 
@@ -509,9 +533,11 @@ namespace	ft
 	{
 		if (this->_size + 1 > this->_capacity)
 		{
-			this->_modify_capacity(this->_size ? this->_size * 2 : 2);
+			this->_modify_capacity(this->_size ? this->_size * 2 : 2,
+				this->_size + 1, val);
 		}
-		this->_content[this->_size] = val;
+		else
+			this->_alloc.construct(this->_content + this->_size, val);
 		this->_size += 1;
 		return ;
 	}
@@ -520,7 +546,10 @@ namespace	ft
 	void	vector< T, Alloc >::pop_back(void)
 	{
 		if (this->_size)
+		{
+			this->_alloc.destroy(this->_content + (this->_size - 1));
 			this->_size -= 1;
+		}
 		return ;
 	}
 
@@ -545,7 +574,8 @@ namespace	ft
 		else
 		{
 			this->_move_values_back(pos_index, 1);
-			this->_content[pos_index] = val;
+			this->_alloc.destroy(this->_content + pos_index);
+			this->_alloc.construct(this->_content + pos_index, val);
 		}
 		this->_size += 1;
 		return (this->begin() + pos_index);
@@ -621,7 +651,8 @@ namespace	ft
 		pos_index = position - this->begin();
 		for (i = pos_index + 1; i < this->_size; ++i)
 		{
-			this->_content[i - 1] = this->_content[i];
+			this->_alloc.destroy(this->_content + i - 1);
+			this->_alloc.construct(this->_content + i - 1, this->_content[i]);
 		}
 		this->resize(this->_size - 1);
 		return (this->begin() + pos_index);
@@ -639,7 +670,9 @@ namespace	ft
 		num_elements = last - first;
 		for (i = pos_index + num_elements; i < this->_size; ++i)
 		{
-			this->_content[i - num_elements] = this->_content[i];
+			this->_alloc.destroy(this->_content + i - num_elements);
+			this->_alloc.construct(this->_content + i - num_elements,
+				this->_content[i]);
 		}
 		this->resize(this->_size - num_elements);
 		return (this->begin() + pos_index);
@@ -704,26 +737,31 @@ namespace	ft
 	{
 		if (!this->_capacity)
 			return ;
-		this->_alloc.destroy(this->_content);
+		for (size_type i = 0; i < this->_size; ++i)
+		{
+			this->_alloc.destroy(this->_content + i);
+		}
 		this->_alloc.deallocate(this->_content, this->_capacity);
 		return ;
 	}
 
 	template< typename T, typename Alloc >
 	void	vector< T, Alloc >::_modify_capacity(size_type new_cap,
-		value_type val)
+		size_type new_size, value_type val)
 	{
 		pointer		aux;
 		size_type	end_old_content;
 		size_type	i;
 
+		if (!new_cap)
+			return ;
 		aux = this->_alloc.allocate(new_cap);
-		end_old_content = this->_size <= new_cap ? this->_size : new_cap;
+		end_old_content = this->_size <= new_cap ? this->_size : new_size;
 		for (i = 0; i < end_old_content; ++i)
 			this->_alloc.construct(aux + i, this->_content[i]);
 		this->_free_content();
 		this->_capacity = new_cap;
-		for (i = end_old_content; i < this->_capacity; ++i)
+		for (i = end_old_content; i < new_size; ++i)
 			this->_alloc.construct(aux + i, val);
 		this->_content = aux;
 		return ;
@@ -737,9 +775,37 @@ namespace	ft
 	
 		for (i = this->_size - 1; i > from_index; --i)
 		{
-			this->_content[i + positions] = this->_content[i];
+			if (this->_size - 1 - i < positions)
+			{
+				/*
+				**	Only construct at memory locations that have been allocated
+				**	but not constructed yet.
+				*/
+				this->_alloc.construct(this->_content + i + positions,
+					this->_content[i]);
+			}
+			else
+			{
+				this->_alloc.destroy(this->_content + i + positions);
+				this->_alloc.construct(this->_content + i + positions, this->_content[i]);
+			}
 		}
-		this->_content[i + positions] = this->_content[i];
+		/*
+		**	WHEN from_index = 0 THE for LOOP WILL CRASH BECAUSE OF i's size_type
+		**	NOT CAPABLE OF REPRESENTING NEGATIVES.
+		**	THIS BLOCK OF CODE PROCESSES THE from_index VALUE
+		**	WITHOUT DECREMENTING i AFTER.
+		*/
+		if (this->_size - 1 - i < positions)
+		{
+			this->_alloc.construct(this->_content + i + positions,
+				this->_content[i]);
+		}
+		else
+		{
+			this->_alloc.destroy(this->_content + i + positions);
+			this->_alloc.construct(this->_content + i + positions, this->_content[i]);
+		}
 		return ;
 	}
 
@@ -764,10 +830,10 @@ namespace	ft
 		{
 			this->_alloc.construct(aux + i, this->_content[j]);
 		}
-		for (; i < new_capacity; ++i)
+		/*for (; i < new_capacity; ++i)
 		{
 			this->_alloc.construct(aux + i, val);
-		}
+		}*/
 		return ;
 	}
 
@@ -795,10 +861,10 @@ namespace	ft
 		{
 			this->_alloc.construct(aux + i, this->_content[j]);
 		}
-		for (; i < new_capacity; ++i)
+		/*for (; i < new_capacity; ++i)
 		{
 			this->_alloc.construct(aux + i, *first);
-		}
+		}*/
 		return ;
 	}
 
@@ -810,7 +876,13 @@ namespace	ft
 
 		for (i = start_pos; i < end_pos; ++i)
 		{
-			this->_content[i] = val;
+			if (i >= this->_size)
+				this->_alloc.construct(this->_content + i, val);
+			else
+			{
+				this->_alloc.destroy(this->_content + i);
+				this->_alloc.construct(this->_content + i, val);
+			}
 		}
 		return ;
 	}
@@ -826,7 +898,13 @@ namespace	ft
 
 		for (i = position, it = first; it != last; ++i, ++it)
 		{
-			this->_content[i] = *it;
+			if (i >= this->_size)
+				this->_alloc.construct(this->_content + i, *it);
+			else
+			{
+				this->_alloc.destroy(this->_content + i);
+				this->_alloc.construct(this->_content + i, *it);
+			}
 		}
 		return ;
 	}
