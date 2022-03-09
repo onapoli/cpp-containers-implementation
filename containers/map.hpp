@@ -525,7 +525,7 @@ namespace	ft
 			{
 				aux = last;
 				--last;
-				this->erase(last);
+				this->erase(aux);
 			}
 			this->erase(last);
 		}
