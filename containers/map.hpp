@@ -781,6 +781,8 @@ namespace	ft
 				: parent->setLeft(right_child);
 		} 
 		node->setParent(right_child);
+		if (right_child->getLeft())
+			right_child->getLeft()->setParent(node);
 		node->setRight(right_child->getLeft());
 		right_child->setLeft(node);
 		return ;
@@ -802,6 +804,8 @@ namespace	ft
 				: parent->setLeft(left_child);
 		}
 		node->setParent(left_child);
+		if (left_child->getRight())
+			left_child->getRight()->setParent(node);
 		node->setLeft(left_child->getRight());
 		left_child->setRight(node);
 		return ;
@@ -955,6 +959,7 @@ namespace	ft
 			}
 			else
 			{
+				//HERE IT IS ASSUMED THAT FAM.gParent IS NOT NULL AND COULD GENERATE SegFault.
 				if (fam.parent == (fam.gParent)->getLeft() &&
 					target == (fam.parent)->getLeft())
 					this->_left_left(target);
