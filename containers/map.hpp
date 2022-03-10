@@ -779,7 +779,9 @@ namespace	ft
 		{
 			parent->getRight() == node ? parent->setRight(right_child)
 				: parent->setLeft(right_child);
-		} 
+		}
+		else
+			this->_root = right_child;
 		node->setParent(right_child);
 		if (right_child->getLeft())
 			right_child->getLeft()->setParent(node);
@@ -803,6 +805,8 @@ namespace	ft
 			parent->getRight() == node ? parent->setRight(left_child)
 				: parent->setLeft(left_child);
 		}
+		else
+			this->_root = left_child;
 		node->setParent(left_child);
 		if (left_child->getRight())
 			left_child->getRight()->setParent(node);
