@@ -64,11 +64,14 @@ public:
 	map_rev_iter(map_rev_iter<Key, T, WasConst, Compare, Alloc> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
 	
+	explicit map_rev_iter(map_iter<Key, T, false,
+				Compare, Alloc> const & src);
+
 	/*
 	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
 	**	FROM const_iterator.
 	*/
-	map_rev_iter &
+	map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 		operator=(map_rev_iter<Key, T, false, Compare, Alloc> const & rhs);
 
 	map_rev_iter	base(void) const;
@@ -120,6 +123,16 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
 	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
 {
 	*this = src;
+	return ;
+}
+
+template< typename Key, typename T, bool IsConst, typename Compare,
+	typename Alloc >
+map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
+	map_iter<Key, T, false, Compare, Alloc> const & src) : _comp(key_compare()),
+		_node(src.getNode()), _end_offset(src.getEndOffset()),
+		_begin_offset(src.getBeginOffset())
+{
 	return ;
 }
 
