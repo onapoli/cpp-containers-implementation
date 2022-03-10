@@ -1307,8 +1307,20 @@ namespace	ft
 	bool	operator<(map<Key,T,Compare,Alloc> const & lhs,
 				map<Key,T,Compare,Alloc> const & rhs)
 	{
-		return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
-			rhs.begin(), rhs.end(), lhs.value_comp()));
+		typename map<Key,T,Compare,Alloc>::const_iterator	it1;
+		typename map<Key,T,Compare,Alloc>::const_iterator	it2;
+
+		for (it1 = lhs.begin(), it2 = rhs.begin(); it1 != lhs.end(); ++it1, ++it2)
+		{
+			if (it2 == rhs.end()
+				|| it2->first < it1->first
+				|| (it2->first == it1->first && it2->second < it1->second))
+				return (false);
+			if (it1->first < it2->first
+				|| (it1->first == it2->first && it1->second < it2->second))
+				return (true);
+		}
+		return (it2 != rhs.end());
 	}
 
 	template < typename Key, typename T, typename Compare, typename Alloc >
