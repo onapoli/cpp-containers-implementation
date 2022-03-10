@@ -638,7 +638,8 @@ namespace	ft
 			{
 				if (node->getLeft()
 					&& (this->_comp(k, node->getLeft()->getValue().first)
-					|| k == node->getLeft()->getValue().first))
+					|| k == node->getLeft()->getValue().first
+					|| node->getLeft()->getRight()))
 					node = node->getLeft();
 				else
 					break ;
@@ -661,10 +662,33 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k) const
 	{
-		//NEED CONVERSION FROM iterator TO const_iterator
+		tree_node *		node;
 		const_iterator	it;
 
-		it = this->lower_bound(k);
+		node = this->_root;
+		while (k != node->getValue().first)
+		{
+			if (this->_comp(k, node->getValue().first))
+			{
+				if (node->getLeft()
+					&& (this->_comp(k, node->getLeft()->getValue().first)
+					|| k == node->getLeft()->getValue().first
+					|| node->getLeft()->getRight()))
+					node = node->getLeft();
+				else
+					break ;
+			}
+			else
+			{
+				if (node->getRight())
+					node = node->getRight();
+				else
+					break ;
+			}
+		}
+		it = const_iterator(node);
+		if (this->_comp(node->getValue().first, k)) //SENDS this->end()
+			++it;
 		return (it);
 	}
 
@@ -684,10 +708,11 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::upper_bound(key_type const & k) const
 	{
-		//NEED CONVERSION FROM iterator TO const_iterator
 		const_iterator	it;
 
-		it = this->upper_bound(k);
+		it = this->lower_bound(k);
+		if (it != this->end() && it->first <= k)
+			++it;
 		return (it);
 	}
 
