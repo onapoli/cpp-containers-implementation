@@ -341,12 +341,18 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
 		map<Key, T, Compare, Alloc>::rbegin(void) const
 	{
-		reverse_iterator	rit;
+		tree_node *	node;
+		iterator	it;
 
 		if (!this->_size)
 			return (const_reverse_iterator(this->_aux));
-		rit = this->rbegin();
-		return (const_reverse_iterator(rit));
+		node = this->_root;
+		while (node->getRight())
+			node = node->getRight();
+		it = iterator(node);
+		++it;
+		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
+			it.getBeginOffset()));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -370,12 +376,17 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
 		map<Key, T, Compare, Alloc>::rend(void) const
 	{
-		reverse_iterator	rit;
-	
+		tree_node *	node;
+		iterator	it;
+
 		if (!this->_size)
 			return (const_reverse_iterator(this->_aux));
-		rit = this->rend();
-		return (const_reverse_iterator(rit));
+		node = this->_root;
+		while (node->getLeft())
+			node = node->getLeft();
+		it = iterator(node);
+		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
+			it.getBeginOffset()));
 	}
 
 	//Capacity
