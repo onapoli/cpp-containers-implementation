@@ -63,7 +63,7 @@ public:
 	typedef	ptrdiff_t								difference_type;
 	typedef std::bidirectional_iterator_tag			iterator_category;
 	
-	typedef TreeNode<Key, T>						node;
+	typedef TreeNode< value_type >					node;
 
 	map_iter(void);
 	explicit map_iter(node * n, size_type end_offset = 0,

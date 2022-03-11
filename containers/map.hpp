@@ -71,7 +71,7 @@ namespace	ft
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
 
-		typedef TreeNode<Key, T>							tree_node;
+		typedef TreeNode< value_type >						tree_node;
 
 		//Member functions
 		explicit map(key_compare const & comp = key_compare(),

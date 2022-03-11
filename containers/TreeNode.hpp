@@ -8,12 +8,12 @@
 **	Red-Black tree data structure from the map container class.
 */
 
-template< typename Key, typename T >
+template< typename T >
 class	TreeNode
 {
 public:
 
-	typedef ft::pair< Key const, T >	value_type;
+	typedef T	value_type;
 
 	TreeNode(void);
 	TreeNode(bool red, TreeNode * parent, value_type * val = 0,
@@ -44,38 +44,38 @@ private:
 
 };
 
-template< typename Key, typename T >
-TreeNode< Key, T >::TreeNode(void) : _red(false), _val(0),
+template< typename T >
+TreeNode< T >::TreeNode(void) : _red(false), _val(0),
 	_parent(0), _left(0), _right(0)
 {
 	return ;
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T >::TreeNode(bool red, TreeNode * parent, value_type * val,
+template< typename T >
+TreeNode< T >::TreeNode(bool red, TreeNode * parent, value_type * val,
 	TreeNode * left, TreeNode * right) : _red(red), _val(val),
 	_parent(parent), _left(left), _right(right)
 {
 	return ;
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T >::TreeNode(TreeNode const & src) : _red(false),
+template< typename T >
+TreeNode< T >::TreeNode(TreeNode const & src) : _red(false),
 	_val(value_type()), _parent(0), _left(0), _right(0)
 {
 	*this = src;
 	return ;
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T >::~TreeNode(void)
+template< typename T >
+TreeNode< T >::~TreeNode(void)
 {
 	return ;
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T > const &
-	TreeNode< Key, T >::operator=(TreeNode const & rhs)
+template< typename T >
+TreeNode< T > const &
+	TreeNode< T >::operator=(TreeNode const & rhs)
 {
 	if (this != &rhs)
 	{
@@ -88,67 +88,67 @@ TreeNode< Key, T > const &
 	return (*this);
 }
 
-template< typename Key, typename T >
-bool	TreeNode< Key, T >::isRed(void) const
+template< typename T >
+bool	TreeNode< T >::isRed(void) const
 {
 	return (this->_red);
 }
 
-template< typename Key, typename T >
-typename TreeNode< Key, T >::value_type &
-	TreeNode< Key, T >::getValue(void) const
+template< typename T >
+typename TreeNode< T >::value_type &
+	TreeNode< T >::getValue(void) const
 {
 	return (*this->_val);
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T > *	TreeNode< Key, T >::getParent(void) const
+template< typename T >
+TreeNode< T > *	TreeNode< T >::getParent(void) const
 {
 	return (this->_parent);
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T > *	TreeNode< Key, T >::getLeft(void) const
+template< typename T >
+TreeNode< T > *	TreeNode< T >::getLeft(void) const
 {
 	return (this->_left);
 }
 
-template< typename Key, typename T >
-TreeNode< Key, T > *	TreeNode< Key, T >::getRight(void) const
+template< typename T >
+TreeNode< T > *	TreeNode< T >::getRight(void) const
 {
 	return (this->_right);
 }
 
-template< typename Key, typename T >
-void	TreeNode< Key, T >::setRed(bool red)
+template< typename T >
+void	TreeNode< T >::setRed(bool red)
 {
 	this->_red = red;
 	return ;
 }
 
-template< typename Key, typename T >
-void	TreeNode< Key, T >::setValue(value_type * val)
+template< typename T >
+void	TreeNode< T >::setValue(value_type * val)
 {
 	this->_val = val;
 	return ;
 }
 
-template< typename Key, typename T >
-void	TreeNode< Key, T >::setParent(TreeNode * parent)
+template< typename T >
+void	TreeNode< T >::setParent(TreeNode * parent)
 {
 	this->_parent = parent;
 	return ;
 }
 
-template< typename Key, typename T >
-void	TreeNode< Key, T >::setLeft(TreeNode * left)
+template< typename T >
+void	TreeNode< T >::setLeft(TreeNode * left)
 {
 	this->_left = left;
 	return ;
 }
 
-template< typename Key, typename T >
-void	TreeNode< Key, T >::setRight(TreeNode * right)
+template< typename T >
+void	TreeNode< T >::setRight(TreeNode * right)
 {
 	this->_right = right;
 	return ;

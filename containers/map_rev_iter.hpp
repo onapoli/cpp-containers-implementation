@@ -50,7 +50,7 @@ public:
 	// TO REUSE THE FUNCTIONALITY OF map_iter IN SOME FUNCTIONS
 	typedef map_iter<Key, T, IsConst, Compare, Alloc>	iter;
 
-	typedef TreeNode<Key, T>						node;
+	typedef TreeNode< value_type >						node;
 
 	map_rev_iter(void);
 	explicit map_rev_iter(node * n, size_type end_offset = 0,
