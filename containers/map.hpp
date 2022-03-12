@@ -873,6 +873,10 @@ namespace	ft
 			target->getParent()->setRed(false);
 		else
 			target->getParent()->setRed(true);
+		/*
+		**	IT IS SAFE TO ASSUME THAT target->getParent()->getRight()
+		**	EXISTS AFTER ROTATION
+		*/
 		if (target->getParent()->getRight()->isRed())
 			target->getParent()->getRight()->setRed(false);
 		else
@@ -906,6 +910,10 @@ namespace	ft
 			target->setRed(false);
 		else
 			target->setRed(true);
+		/*
+		**	IT IS SAFE TO ASSUME THAT target->getRight()
+		**	EXISTS AFTER ROTATIONS
+		*/
 		if (target->getRight()->isRed())
 			target->getRight()->setRed(false);
 		else
@@ -937,6 +945,10 @@ namespace	ft
 			target->getParent()->setRed(false);
 		else
 			target->getParent()->setRed(true);
+		/*
+		**	IT IS SAFE TO ASSUME THAT target->getParent()->getLeft()
+		**	EXISTS AFTER ROTATION
+		*/
 		if (target->getParent()->getLeft()->isRed())
 			target->getParent()->getLeft()->setRed(false);
 		else
@@ -970,6 +982,10 @@ namespace	ft
 			target->setRed(false);
 		else
 			target->setRed(true);
+		/*
+		**	IT IS SAFE TO ASSUME THAT target->getLeft()
+		**	EXISTS AFTER ROTATIONS
+		*/
 		if (target->getLeft()->isRed())
 			target->getLeft()->setRed(false);
 		else
@@ -999,15 +1015,18 @@ namespace	ft
 			}
 			else
 			{
-				//HERE IT IS ASSUMED THAT FAM.gParent IS NOT NULL AND COULD GENERATE SegFault.
+				/*
+				**	SEEMS SAFE TO ASSUME fam.gParent IS NOT NULL
+				**	WHEN ENTERING THIS BLOCK.
+				*/
 				if (fam.parent == (fam.gParent)->getLeft() &&
-					target == (fam.parent)->getLeft())
+						target == (fam.parent)->getLeft())
 					this->_left_left(target);
 				else if (fam.parent == (fam.gParent)->getLeft() &&
-					target == (fam.parent)->getRight())
+							target == (fam.parent)->getRight())
 					this->_left_right(target);
 				else if (fam.parent == (fam.gParent)->getRight() &&
-					target == (fam.parent)->getRight())
+							target == (fam.parent)->getRight())
 					this->_right_right(target);
 				else
 					this->_right_left(target);
@@ -1022,15 +1041,22 @@ namespace	ft
 		map<Key, T, Compare, Alloc>::_insert_node(tree_node * node,
 			value_type const & val)
 	{
+		tree_node *	new_node;
+	
 		if (this->_comp(val.first, node->getValue().first))
 		{
 			if (!node->getLeft())
 			{
 				node->setLeft(new tree_node(true, node,
 					this->_persist_val(val), 0, 0));
-				this->_balance_insert(node->getLeft());
+				/*
+				**	new_node VARIABLE IS NECESSARY, AS node->getLeft()
+				**	MIGHT POINT TO OTHER NODE OR TO NULL AFTER ROTATIONS.
+				*/
+				new_node = node->getLeft();
+				this->_balance_insert(new_node);
 				return (ft::make_pair<iterator,
-					bool>(iterator(node->getLeft()), true));
+					bool>(iterator(new_node), true));
 			}
 			return (this->_insert_node(node->getLeft(), val));
 		}
@@ -1040,9 +1066,14 @@ namespace	ft
 			{
 				node->setRight(new tree_node(true, node,
 					this->_persist_val(val), 0, 0));
-				this->_balance_insert(node->getRight());
+				/*
+				**	new_node VARIABLE IS NECESSARY, AS node->getRight()
+				**	MIGHT POINT TO OTHER NODE OR TO NULL AFTER ROTATIONS.
+				*/
+				new_node = node->getRight();
+				this->_balance_insert(new_node);
 				return (ft::make_pair<iterator,
-					bool>(iterator(node->getRight()), true));
+					bool>(iterator(new_node), true));
 			}
 			return (this->_insert_node(node->getRight(), val));
 		}
