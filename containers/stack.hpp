@@ -33,40 +33,40 @@ namespace	ft
 		friend bool	operator==(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr == rhs._ctnr);
+			return (lhs.c == rhs.c);
 		}
 		friend bool	operator!=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr != rhs._ctnr);
+			return (lhs.c != rhs.c);
 		}
 		friend bool	operator<(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr < rhs._ctnr);
+			return (lhs.c < rhs.c);
 		}
 		friend bool	operator<=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr <= rhs._ctnr);
+			return (lhs.c <= rhs.c);
 		}
 		friend bool	operator>(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr > rhs._ctnr);
+			return (lhs.c > rhs.c);
 		}
 		friend bool	operator>=(stack< T, Container > const & lhs,
 						stack< T, Container > const & rhs)
 		{
-			return (lhs._ctnr >= rhs._ctnr);
+			return (lhs.c >= rhs.c);
 		}
 
-	private:
-		container_type	_ctnr;
+	protected:
+		container_type	c;
 	};
 
 	template< typename T, typename Container >
-	stack< T, Container >::stack(container_type const & ctnr) : _ctnr(ctnr)
+	stack< T, Container >::stack(container_type const & ctnr) : c(ctnr)
 	{
 		//CUIDADO, DICE LA REFERENCIA QUE ALMACENA UNA COPIA. COMPROBAR SI ES ASÍ.
 		return ;
@@ -75,41 +75,41 @@ namespace	ft
 	template< typename T, typename Container >
 	bool	stack< T, Container >::empty(void) const
 	{
-		return (this->_ctnr.empty());
+		return (this->c.empty());
 	}
 
 	template< typename T, typename Container >
 	typename stack< T, Container >::size_type
 		stack< T, Container >::size(void) const
 	{
-		return (this->_ctnr.size());
+		return (this->c.size());
 	}
 
 	template< typename T, typename Container >
 	typename stack< T, Container >::value_type &
 		stack< T, Container >::top(void)
 	{
-		return (this->_ctnr.back());
+		return (this->c.back());
 	}
 
 	template< typename T, typename Container >
 	typename stack< T, Container >::value_type const &
 		stack< T, Container >::top(void) const
 	{
-		return (this->_ctnr.back());
+		return (this->c.back());
 	}
 
 	template< typename T, typename Container >
 	void	stack< T, Container >::push(value_type const & val)
 	{
-		this->_ctnr.push_back(val);
+		this->c.push_back(val);
 		return ;
 	}
 
 	template< typename T, typename Container >
 	void	stack< T, Container >::pop(void)
 	{
-		this->_ctnr.pop_back();
+		this->c.pop_back();
 		return ;
 	}
 
