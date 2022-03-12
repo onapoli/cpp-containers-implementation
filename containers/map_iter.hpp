@@ -221,23 +221,25 @@ map_iter<Key, T, IsConst, Compare, Alloc> &
 	{
 		if (this->_node)
 		{
-			while (1)
+			if (this->_node->getRight())
 			{
-				if (this->_node->getLeft()
-					&& this->_comp(prev->getValue().first,
-						this->_node->getLeft()->getValue().first))
+				this->_node = this->_node->getRight();
+				while (this->_node->getLeft())
 					this->_node = this->_node->getLeft();
-				else if (this->_comp(prev->getValue().first,
-					this->_node->getValue().first))
-					break ;
-				else if (this->_node->getRight()
-					&& this->_comp(prev->getValue().first,
-						this->_node->getRight()->getValue().first))
-					this->_node = this->_node->getRight();
-				else
+			}
+			else
+			{
+				while (1)
 				{
 					if (this->_node->getParent())
+					{
+						if (this->_node == this->_node->getParent()->getLeft())
+						{
+							this->_node = this->_node->getParent();
+							break ;
+						}
 						this->_node = this->_node->getParent();
+					}
 					else
 					{
 						this->_node = prev;
@@ -245,7 +247,7 @@ map_iter<Key, T, IsConst, Compare, Alloc> &
 						break ;
 					}
 				}
-			}				
+			}
 		}
 		else
 			++this->_end_offset;
@@ -280,27 +282,29 @@ map_iter<Key, T, IsConst, Compare, Alloc> &
 	{
 		if (this->_node)
 		{
-			while (1)
+			if (this->_node->getLeft())
 			{
-				if (this->_node->getRight()
-					&& this->_comp(this->_node->getRight()->getValue().first,
-						prev->getValue().first))
+				this->_node = this->_node->getLeft();
+				while (this->_node->getRight())
 					this->_node = this->_node->getRight();
-				else if (this->_comp(this->_node->getValue().first,
-					prev->getValue().first))
-					break ;
-				else if (this->_node->getLeft()
-					&& this->_comp(this->_node->getLeft()->getValue().first,
-						prev->getValue().first))
-					this->_node = this->_node->getLeft();
-				else
+			}
+			else
+			{
+				while (1)
 				{
 					if (this->_node->getParent())
+					{
+						if (this->_node == this->_node->getParent()->getRight())
+						{
+							this->_node = this->_node->getParent();
+							break ;
+						}
 						this->_node = this->_node->getParent();
+					}
 					else
 					{
 						this->_node = prev;
-						++this->_begin_offset;
+						++this->_end_offset;
 						break ;
 					}
 				}
