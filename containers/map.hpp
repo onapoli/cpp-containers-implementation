@@ -18,6 +18,10 @@
 namespace	ft
 {
 
+	/*
+	**	ft::map CLASS DECLARATION
+	*/
+
 	template< typename Key, typename T, typename Compare = std::less< Key >,
 		typename Alloc = std::allocator< ft::pair<Key const, T> > >
 	class	map
@@ -290,7 +294,7 @@ namespace	ft
 		map<Key, T, Compare, Alloc>::end(void)
 	{
 		tree_node *	node;
-		iterator			it;
+		iterator	it;
 
 		if (!this->_size)
 			return (iterator(this->_aux));
@@ -306,8 +310,8 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::end(void) const
 	{
-		tree_node *	node;
-		const_iterator			it;
+		tree_node *		node;
+		const_iterator	it;
 
 		if (!this->_size)
 			return (const_iterator(this->_aux));
@@ -333,8 +337,8 @@ namespace	ft
 			node = node->getRight();
 		it = iterator(node);
 		++it;
-		return (reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -351,8 +355,8 @@ namespace	ft
 			node = node->getRight();
 		it = iterator(node);
 		++it;
-		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (const_reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -368,8 +372,8 @@ namespace	ft
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
@@ -385,8 +389,8 @@ namespace	ft
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (const_reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	//Capacity
@@ -457,15 +461,15 @@ namespace	ft
 			return (iterator(this->_root));
 		}
 		if (this->_comp(position->first, val.first)
-			&& (!position.getNode()->getParent()
-				|| this->_comp(position.getNode()->getParent()->getValue().first,
+			&& (!position._node->getParent()
+				|| this->_comp(position._node->getParent()->getValue().first,
 					position->first)))
-			pr = this->_insert_node(position.getNode(), val);
+			pr = this->_insert_node(position._node, val);
 		else if(this->_comp(val.first, position->first)
-			&& (!position.getNode()->getParent()
+			&& (!position._node->getParent()
 				|| this->_comp(position->first,
-				position.getNode()->getParent()->getValue().first)))
-			pr = this->_insert_node(position.getNode(), val);
+				position._node->getParent()->getValue().first)))
+			pr = this->_insert_node(position._node, val);
 		else
 			pr = this->_insert_node(this->_root, val);
 		if (pr.second)
@@ -500,7 +504,7 @@ namespace	ft
 	{
 		if (position == this->end())
 			return ;
-		this->_delete_node(position.getNode());
+		this->_delete_node(position._node);
 		this->_size -= 1;
 		return ;
 	}
@@ -555,7 +559,7 @@ namespace	ft
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void	map<Key, T, Compare, Alloc>::swap(map & x)
 	{
-		size_type			aux_size;
+		size_type	aux_size;
 		tree_node *	aux_root;
 
 		/*
@@ -640,7 +644,7 @@ namespace	ft
 		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k)
 	{
 		tree_node *	node;
-		iterator			it;
+		iterator	it;
 
 		node = this->_root;
 		while (k != node->getValue().first)
@@ -1180,7 +1184,7 @@ namespace	ft
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void	map<Key, T, Compare, Alloc>::_delete_node(tree_node * node)
 	{
-		_t_node_fam			node_fam;
+		_t_node_fam	node_fam;
 		tree_node *	substitute;
 	
 		this->_init_fam(node, node_fam);
@@ -1292,8 +1296,8 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::tree_node *
 		map<Key, T, Compare, Alloc>::_search(key_type const & k) const
 	{
-		tree_node *	node;
-		value_type *		node_val;
+		tree_node *		node;
+		value_type *	node_val;
 
 		node = this->_root;
 		while (node)

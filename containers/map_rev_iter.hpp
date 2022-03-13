@@ -8,6 +8,12 @@
 # include "../type_traits/type_traits.hpp"
 # include "TreeNode.hpp"
 # include "map_iter.hpp"
+# include "choose.hpp"
+
+// CIRCULAR DEPENDENCY
+template< typename Key, typename T, bool IsConst,
+	typename Compare, typename Alloc >
+class	map_iter; 
 
 /*
 **	MAP REVERSE ITERATOR class DECLARATION
@@ -64,8 +70,7 @@ public:
 	map_rev_iter(map_rev_iter<Key, T, WasConst, Compare, Alloc> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
 	
-	explicit map_rev_iter(map_iter<Key, T, false,
-				Compare, Alloc> const & src);
+	explicit map_rev_iter(map_iter<Key, T, false, Compare, Alloc> const & src);
 
 	/*
 	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
@@ -86,7 +91,7 @@ public:
 
 private:
 
-	//In order to access private members of const from non const.
+	//In order to access private members of non-const from const.
 	friend class	map_rev_iter<Key, T, true, Compare, Alloc>;
 
 	key_compare	_comp;
@@ -130,8 +135,8 @@ template< typename Key, typename T, bool IsConst, typename Compare,
 	typename Alloc >
 map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
 	map_iter<Key, T, false, Compare, Alloc> const & src) : _comp(key_compare()),
-		_node(src.getNode()), _end_offset(src.getEndOffset()),
-		_begin_offset(src.getBeginOffset())
+		_node(src._node), _end_offset(src._end_offset),
+		_begin_offset(src._begin_offset)
 {
 	return ;
 }
@@ -181,9 +186,9 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 	iter	it(this->_node, this->_end_offset, this->_begin_offset);
 
 	--it;
-	this->_node = it.getNode();
-	this->_end_offset = it.getEndOffset();
-	this->_begin_offset = it.getBeginOffset();
+	this->_node = it._node;
+	this->_end_offset = it._end_offset;
+	this->_begin_offset = it._begin_offset;
 	return (*this);
 }
 
@@ -207,9 +212,9 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 	iter	it(this->_node, this->_end_offset, this->_begin_offset);
 
 	++it;
-	this->_node = it.getNode();
-	this->_end_offset = it.getEndOffset();
-	this->_begin_offset = it.getBeginOffset();
+	this->_node = it._node;
+	this->_end_offset = it._end_offset;
+	this->_begin_offset = it._begin_offset;
 	return (*this);
 }
 

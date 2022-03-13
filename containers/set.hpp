@@ -295,8 +295,8 @@ namespace	ft
 			node = node->getRight();
 		it = iterator(node);
 		++it;
-		return (reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -313,8 +313,8 @@ namespace	ft
 			node = node->getRight();
 		it = iterator(node);
 		++it;
-		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (const_reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -330,8 +330,8 @@ namespace	ft
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -347,8 +347,8 @@ namespace	ft
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (const_reverse_iterator(it.getNode(), it.getEndOffset(),
-			it.getBeginOffset()));
+		return (const_reverse_iterator(it._node, it._end_offset,
+			it._begin_offset));
 	}
 
 	//Capacity
@@ -409,15 +409,15 @@ namespace	ft
 			return (iterator(this->_root));
 		}
 		if (this->_comp(*position, val)
-			&& (!position.getNode()->getParent()
-				|| this->_comp(position.getNode()->getParent()->getValue(),
+			&& (!position._node->getParent()
+				|| this->_comp(position._node->getParent()->getValue(),
 					*position)))
-			pr = this->_insert_node(position.getNode(), val);
+			pr = this->_insert_node(position._node, val);
 		else if(this->_comp(val, *position)
-			&& (!position.getNode()->getParent()
+			&& (!position._node->getParent()
 				|| this->_comp(*position,
-				position.getNode()->getParent()->getValue())))
-			pr = this->_insert_node(position.getNode(), val);
+				position._node->getParent()->getValue())))
+			pr = this->_insert_node(position._node, val);
 		else
 			pr = this->_insert_node(this->_root, val);
 		if (pr.second)
@@ -452,7 +452,7 @@ namespace	ft
 	{
 		if (position == this->end())
 			return ;
-		this->_delete_node(position.getNode());
+		this->_delete_node(position._node);
 		this->_size -= 1;
 		return ;
 	}
@@ -1062,7 +1062,7 @@ namespace	ft
 	template< typename T, typename Compare, typename Alloc >
 	void	set<T, Compare, Alloc>::_delete_node(tree_node * node)
 	{
-		_t_node_fam			node_fam;
+		_t_node_fam	node_fam;
 		tree_node *	substitute;
 	
 		this->_init_fam(node, node_fam);

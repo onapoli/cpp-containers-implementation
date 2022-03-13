@@ -6,6 +6,15 @@
 
 # include "TreeNode.hpp"
 # include "../type_traits/type_traits.hpp"
+# include "set.hpp"
+# include "set_rev_iter.hpp"
+
+namespace	ft
+{
+	// CIRCULAR DEPENDENCY
+	template< typename T, typename Compare, typename Alloc >
+	class	set;
+}
 
 /*
 **	set ITERATOR CLASS DECLARATION
@@ -55,13 +64,19 @@ public:
 	set_iter &		operator--(void);
 	set_iter		operator--(int);
 
-	node *			getNode(void) const;
-	size_type		getEndOffset(void) const;
-	size_type		getBeginOffset(void) const;
-	void			setEndOffset(size_type offset);
-	void			setBeginOffset(size_type offset);
-
 private:
+
+	/*
+	**	ft::set AND set_rev_iter FRIENDSHIPS ARE NEEDED TO ELUDE THE CREATION
+	**	OF PUBLIC GETTERS, WHICH ARE NOT PRESENT IN STANDARD ITERATORS.
+	**
+	**	friend DECLARATIONS ARE THE SAME WHETHER THEY ARE LOCATED IN public,
+	**	private OR protected BLOCKS.
+	*/
+
+	friend class	set_rev_iter<T, Compare, Alloc>;
+
+	friend class	ft::set<T, Compare, Alloc>;
 
 	key_compare	_comp;
 	node *		_node;
@@ -264,43 +279,6 @@ set_iter<T, Compare, Alloc>
 
 	--(*this);
 	return (s);
-}
-
-template< typename T, typename Compare, typename Alloc >
-typename set_iter<T, Compare, Alloc>::node *
-	set_iter<T, Compare, Alloc>::getNode(void) const
-{
-	return (this->_node);
-}
-
-template< typename T, typename Compare, typename Alloc >
-typename set_iter<T, Compare, Alloc>::size_type
-	set_iter<T, Compare, Alloc>::getEndOffset(void) const
-{
-	return (this->_end_offset);
-}
-
-template< typename T, typename Compare, typename Alloc >
-typename set_iter<T, Compare, Alloc>::size_type
-	set_iter<T, Compare, Alloc>::getBeginOffset(void) const
-{
-	return (this->_begin_offset);
-}
-
-template< typename T, typename Compare, typename Alloc >
-void
-	set_iter<T, Compare, Alloc>::setEndOffset(size_type offset)
-{
-	this->_end_offset = offset;
-	return ;
-}
-
-template< typename T, typename Compare, typename Alloc >
-void
-	set_iter<T, Compare, Alloc>::setBeginOffset(size_type offset)
-{
-	this->_begin_offset = offset;
-	return ;
 }
 
 #endif

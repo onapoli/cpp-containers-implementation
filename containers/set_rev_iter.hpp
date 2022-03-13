@@ -9,6 +9,10 @@
 # include "TreeNode.hpp"
 # include "set_iter.hpp"
 
+//CIRCULAR DEPENDENCY
+template< typename T, typename Compare, typename Alloc>
+class	set_iter;
+
 /*
 **	SET REVERSE ITERATOR class DECLARATION
 */
@@ -94,8 +98,8 @@ set_rev_iter<T, Compare, Alloc>::set_rev_iter(set_rev_iter const & src)
 template< typename T, typename Compare, typename Alloc >
 set_rev_iter<T, Compare, Alloc>::set_rev_iter(
 	set_iter<T, Compare, Alloc> const & src) : _comp(key_compare()),
-		_node(src.getNode()), _end_offset(src.getEndOffset()),
-		_begin_offset(src.getBeginOffset())
+		_node(src._node), _end_offset(src._end_offset),
+		_begin_offset(src._begin_offset)
 {
 	return ;
 }
@@ -147,9 +151,9 @@ set_rev_iter<T, Compare, Alloc> &
 	iter	it(this->_node, this->_end_offset, this->_begin_offset);
 
 	--it;
-	this->_node = it.getNode();
-	this->_end_offset = it.getEndOffset();
-	this->_begin_offset = it.getBeginOffset();
+	this->_node = it._node;
+	this->_end_offset = it._end_offset;
+	this->_begin_offset = it._begin_offset;
 	return (*this);
 }
 
@@ -171,9 +175,9 @@ set_rev_iter<T, Compare, Alloc> &
 	iter	it(this->_node, this->_end_offset, this->_begin_offset);
 
 	++it;
-	this->_node = it.getNode();
-	this->_end_offset = it.getEndOffset();
-	this->_begin_offset = it.getBeginOffset();
+	this->_node = it._node;
+	this->_end_offset = it._end_offset;
+	this->_begin_offset = it._begin_offset;
 	return (*this);
 }
 

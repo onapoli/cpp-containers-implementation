@@ -6,26 +6,16 @@
 
 # include "TreeNode.hpp"
 # include "../type_traits/type_traits.hpp"
+# include "map.hpp"
+# include "map_rev_iter.hpp"
 # include "choose.hpp"
 
-/*
-**	STRUCTURE TO SELECT THE RIGHT map_iter reference AND pointer TYPE
-**	THROUGH SFINAE AND PARTIAL TEMPLATE SPECIALIZATION.
-*/
-
-/*template <bool flag, class IsTrue, class IsFalse>
-struct choose;
-
-template <class IsTrue, class IsFalse>
-struct choose<true, IsTrue, IsFalse> {
-   typedef IsTrue type;
-};
-
-template <class IsTrue, class IsFalse>
-struct choose<false, IsTrue, IsFalse> {
-   typedef IsFalse type;
-};*/
-
+namespace	ft
+{
+	// CIRCULAR DEPENDENCY
+	template< typename Key, typename T, typename Compare, typename Alloc >
+	class	map;
+}
 
 /*
 **	map ITERATOR CLASS DECLARATION
@@ -95,16 +85,28 @@ public:
 	map_iter &	operator--(void);
 	map_iter	operator--(int);
 
-	node *		getNode(void) const;
-	size_type	getEndOffset(void) const;
-	size_type	getBeginOffset(void) const;
-	void		setEndOffset(size_type offset);
-	void		setBeginOffset(size_type offset);
-
 private:
 
-	//In order to access private members of const from non const.
+	//In order to access private members of non-const from const.
 	friend class	map_iter<Key, T, true, Compare, Alloc>;
+
+	/*
+	**	ft::map AND map_rev_iter FRIENDSHIPS ARE NEEDED TO ELUDE THE CREATION
+	**	OF PUBLIC GETTERS, WHICH ARE NOT PRESENT IN STANDARD ITERATORS.
+	**	
+	*/
+
+	/*
+	**	To interact with and reuse map_iter functionality from map_rev_iter.
+	**	Adding explicitly both specializations of IsConst, because IsConst
+	**	is either true or false in this instance, and need interaction with
+	**	both. IsConst is no longer an undefined variable inside this instance,
+	**	that is why it needs to be defined explicitly to include both versions.
+	*/
+	friend class	map_rev_iter<Key, T, true, Compare, Alloc>;
+	friend class	map_rev_iter<Key, T, false, Compare, Alloc>;
+
+	friend class	ft::map<Key, T, Compare, Alloc>;
 
 	key_compare	_comp;
 	node *		_node;
@@ -325,48 +327,6 @@ map_iter<Key, T, IsConst, Compare, Alloc>
 
 	--(*this);
 	return (m);
-}
-
-template< typename Key, typename T, bool IsConst,
-	typename Compare, typename Alloc >
-typename map_iter<Key, T, IsConst, Compare, Alloc>::node *
-	map_iter<Key, T, IsConst, Compare, Alloc>::getNode(void) const
-{
-	return (this->_node);
-}
-
-template< typename Key, typename T, bool IsConst,
-	typename Compare, typename Alloc >
-typename map_iter<Key, T, IsConst, Compare, Alloc>::size_type
-	map_iter<Key, T, IsConst, Compare, Alloc>::getEndOffset(void) const
-{
-	return (this->_end_offset);
-}
-
-template< typename Key, typename T, bool IsConst,
-	typename Compare, typename Alloc >
-typename map_iter<Key, T, IsConst, Compare, Alloc>::size_type
-	map_iter<Key, T, IsConst, Compare, Alloc>::getBeginOffset(void) const
-{
-	return (this->_begin_offset);
-}
-
-template< typename Key, typename T, bool IsConst,
-	typename Compare, typename Alloc >
-void
-	map_iter<Key, T, IsConst, Compare, Alloc>::setEndOffset(size_type offset)
-{
-	this->_end_offset = offset;
-	return ;
-}
-
-template< typename Key, typename T, bool IsConst,
-	typename Compare, typename Alloc >
-void
-	map_iter<Key, T, IsConst, Compare, Alloc>::setBeginOffset(size_type offset)
-{
-	this->_begin_offset = offset;
-	return ;
 }
 
 #endif
