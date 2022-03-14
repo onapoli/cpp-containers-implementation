@@ -5,8 +5,6 @@
 # include <functional>
 # include <cstddef>
 
-#include <iostream> // FOR TESTING
-
 # include "../utility/utility.hpp"
 # include "../type_traits/type_traits.hpp"
 # include "../iterator/iterator.hpp"
@@ -100,9 +98,6 @@ namespace	ft
 		//Allocator
 		allocator_type				get_allocator() const;
 
-		//test
-		void						printTree() const;
-
 	private:
 
 		typedef struct	_s_node_fam
@@ -144,9 +139,6 @@ namespace	ft
 		tree_node *					_copy_tree(tree_node * node);
 		//utility function
 		tree_node *					_search(key_type const & k) const;
-		//test function
-		void						_printTree(tree_node * node,
-										int space) const;
 	
 	};
 
@@ -640,14 +632,6 @@ namespace	ft
 		set<T, Compare, Alloc>::get_allocator(void) const
 	{
 		return (this->_alloc);
-	}
-
-	//test
-	template< typename T, typename Compare, typename Alloc >
-	void	set<T, Compare, Alloc>::printTree(void) const
-	{
-		this->_printTree(this->_root, 0);
-		return ;
 	}
 
 	//Private member functions
@@ -1190,24 +1174,6 @@ namespace	ft
 		}
 		return (node);
 	}
-
-	template< typename T, typename Compare, typename Alloc >
-	void	set<T, Compare, Alloc>::_printTree(tree_node * node,
-				int space) const
-    {
-        int	i;
-	
-        if (node)
-        {
-            space += 10;
-            this->_printTree(node->getRight(), space);
-            std::cout << "\n";
-            for (i = 10; i < space; ++i)
-                std::cout << " ";
-            std::cout << node->getValue() << std::endl;
-            this->_printTree(node->getLeft(), space);
-        }
-    }
 
 	// Non_Member functions
 
