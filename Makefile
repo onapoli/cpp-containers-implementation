@@ -40,4 +40,4 @@ leaks:
 fclean:
 	@rm $(EXEC_NAME)
 
-.PHONY: vector stack map map_iter leaks fclean
+.PHONY: all vector stack map map_iter algorithm type_traits leaks fclean
