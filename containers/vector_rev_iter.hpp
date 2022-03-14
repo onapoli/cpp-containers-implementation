@@ -4,6 +4,11 @@
 # include <iterator> // TO GET iterator_category
 
 # include "vector_iter.hpp"
+# include "choose.hpp"
+
+//CIRCULAR DEPENDENCY
+template< typename T, bool IsConst >
+class	vector_iter;
 
 /*
 **	VECTOR REVERSE ITERATOR class DECLARATION
@@ -106,7 +111,7 @@ vector_rev_iter<T, IsConst>::vector_rev_iter(
 
 template< typename T, bool IsConst >
 vector_rev_iter<T, IsConst>::vector_rev_iter(vector_iter<T, false> const & src)
-	: _v(src.getContent())
+	: _v(src._v)
 {
 	return ;
 }

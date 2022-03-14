@@ -2,27 +2,8 @@
 # define VECTOR_ITER_H
 
 # include "../type_traits/type_traits.hpp"
+# include "vector_rev_iter.hpp"
 # include "choose.hpp"
-
-/*
-**	STRUCTURE TO SELECT THE RIGHT vector_iter reference AND pointer TYPE
-**	THROUGH SFINAE AND PARTIAL TEMPLATE SPECIALIZATION.
-*/
-
-/*template <bool flag, class IsTrue, class IsFalse>
-struct choose;
-
-template <class IsTrue, class IsFalse>
-struct choose<true, IsTrue, IsFalse> {
-	typedef IsTrue type;
-};
-
-template <class IsTrue, class IsFalse>
-struct choose<false, IsTrue, IsFalse> {
-	typedef IsFalse type;
-};*/
-
-
 
 /*
 **	vector ITERATOR CLASS DECLARATION
@@ -95,12 +76,22 @@ public:
 	vector_iter<T, IsConst> &	operator-=(difference_type offset);
 	reference					operator[](difference_type offset) const;
 
-	pointer						getContent(void) const;
-
 private:
 
 	//In order to access private members of const from non const.
 	friend class	vector_iter<T, true>;
+
+	/*
+	**	vector_rev_iter FRIENDSHIP IS NEEDED TO ELUDE THE CREATION
+	**	OF PUBLIC GETTERS, WHICH ARE NOT PRESENT IN STANDARD ITERATORS.
+	**
+	**	Adding explicitly both specializations of IsConst, because IsConst
+	**	is either true or false in this instance, and need interaction with
+	**	both. IsConst is no longer an undefined variable inside this instance,
+	**	that is why it needs to be defined explicitly to include both versions.	
+	*/
+	friend class	vector_rev_iter<T, true>;
+	friend class	vector_rev_iter<T, false>;
 
 	pointer	_v;
 
@@ -292,26 +283,11 @@ typename vector_iter<T, IsConst>::reference
 }
 
 template< typename T, bool IsConst >
-typename vector_iter<T, IsConst>::pointer
-	vector_iter<T, IsConst>::getContent(void) const
-{
-	return (this->_v);
-}
-
-template< typename T, bool IsConst >
 vector_iter<T, IsConst>
 	operator+(typename vector_iter<T, IsConst>::difference_type offset,
 		vector_iter<T, IsConst> const & rhs)
 {
 	return (rhs + offset);
-}
-
-template < typename T, bool IsConst >
-typename vector_iter<T, IsConst>::difference_type
-	operator-(vector_iter<T, IsConst> const & lhs,
-		vector_iter<T, IsConst> const & rhs)
-{
-	return (rhs.getContent() - lhs.getContent());
 }
 
 #endif
