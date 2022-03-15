@@ -53,7 +53,7 @@ public:
 	vector_rev_iter<T, IsConst>(vector_rev_iter<T, WasConst> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
 	
-	explicit vector_rev_iter(vector_iter<T, false> const & src);
+	explicit vector_rev_iter(vector_iter<T, IsConst> const & src);
 	
 	/*
 	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
@@ -110,7 +110,7 @@ vector_rev_iter<T, IsConst>::vector_rev_iter(
 }
 
 template< typename T, bool IsConst >
-vector_rev_iter<T, IsConst>::vector_rev_iter(vector_iter<T, false> const & src)
+vector_rev_iter<T, IsConst>::vector_rev_iter(vector_iter<T, IsConst> const & src)
 	: _v(src._v)
 {
 	return ;
