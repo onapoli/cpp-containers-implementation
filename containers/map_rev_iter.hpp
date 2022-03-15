@@ -59,8 +59,7 @@ public:
 	typedef TreeNode< value_type >						node;
 
 	map_rev_iter(void);
-	explicit map_rev_iter(node * n, size_type end_offset = 0,
-		size_type begin_offset = 0);
+	explicit map_rev_iter(node * n, node * prev = 0);
 
 	/*
 	**	SFINAE WILL ONLY ALLOW COPYING FROM A NON-CONST rev_it TO
@@ -70,7 +69,8 @@ public:
 	map_rev_iter(map_rev_iter<Key, T, WasConst, Compare, Alloc> const & src,
 		typename ft::enable_if<IsConst || !WasConst>::type * = 0);
 	
-	explicit map_rev_iter(map_iter<Key, T, false, Compare, Alloc> const & src);
+	explicit
+		map_rev_iter(map_iter<Key, T, IsConst, Compare, Alloc> const & src);
 
 	/*
 	**	ADDED SPECIALIZATION TO PREVENT iterator ASSIGNMENT
@@ -96,15 +96,14 @@ private:
 
 	key_compare	_comp;
 	node *		_node;
-	size_type	_end_offset;
-	size_type	_begin_offset;
+	node *		_prev;
 
 };
 
 template< typename Key, typename T, bool IsConst, typename Compare,
 	typename Alloc >
 map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(void)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	return ;
 }
@@ -112,9 +111,7 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(void)
 template< typename Key, typename T, bool IsConst, typename Compare,
 	typename Alloc >
 map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(node * n,
-	size_type end_offset, size_type begin_offset)
-	: _comp(key_compare()), _node(n), _end_offset(end_offset),
-	_begin_offset(begin_offset)
+	node * prev) : _comp(key_compare()), _node(n), _prev(prev)
 {
 	return ;
 }
@@ -125,7 +122,7 @@ template< bool WasConst >
 map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
 	map_rev_iter<Key, T, WasConst, Compare, Alloc> const & src,
 	typename ft::enable_if<IsConst || !WasConst>::type *)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	*this = src;
 	return ;
@@ -134,9 +131,8 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
 template< typename Key, typename T, bool IsConst, typename Compare,
 	typename Alloc >
 map_rev_iter<Key, T, IsConst, Compare, Alloc>::map_rev_iter(
-	map_iter<Key, T, false, Compare, Alloc> const & src) : _comp(key_compare()),
-		_node(src._node), _end_offset(src._end_offset),
-		_begin_offset(src._begin_offset)
+	map_iter<Key, T, IsConst, Compare, Alloc> const & src)
+		: _comp(key_compare()), _node(src._node), _prev(src._prev)
 {
 	return ;
 }
@@ -153,8 +149,7 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 	*/
 	this->_comp = rhs._comp;
 	this->_node = rhs._node;
-	this->_end_offset = rhs._end_offset;
-	this->_begin_offset = rhs._begin_offset;
+	this->_prev = rhs._prev;
 	return (*this);
 }
 
@@ -172,7 +167,7 @@ typename map_rev_iter<Key, T, IsConst, Compare, Alloc>::reference
 	map_rev_iter<Key, T, IsConst, Compare, Alloc>::operator*(void) const
 {
 	//THIS IS THE map_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	return (*(--it));
 }
@@ -183,12 +178,11 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 	map_rev_iter<Key, T, IsConst, Compare, Alloc>::operator++(void)
 {
 	//THIS IS THE map_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	--it;
 	this->_node = it._node;
-	this->_end_offset = it._end_offset;
-	this->_begin_offset = it._begin_offset;
+	this->_prev = it._prev;
 	return (*this);
 }
 
@@ -209,12 +203,11 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 	map_rev_iter<Key, T, IsConst, Compare, Alloc>::operator--(void)
 {
 	//THIS IS THE map_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	++it;
 	this->_node = it._node;
-	this->_end_offset = it._end_offset;
-	this->_begin_offset = it._begin_offset;
+	this->_prev = it._prev;
 	return (*this);
 }
 
@@ -243,9 +236,7 @@ bool
 	map_rev_iter<Key, T, IsConst,
 		Compare, Alloc>::operator!=(map_rev_iter const & rhs) const
 {
-	return (this->_node != rhs._node
-		|| this->_begin_offset != rhs._begin_offset
-		|| this->_end_offset != rhs._end_offset);
+	return (this->_node != rhs._node);
 }
 
 template< typename Key, typename T, bool IsConst, typename Compare,
