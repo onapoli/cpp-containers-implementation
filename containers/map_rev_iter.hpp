@@ -79,7 +79,7 @@ public:
 	map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 		operator=(map_rev_iter<Key, T, false, Compare, Alloc> const & rhs);
 
-	map_rev_iter	base(void) const;
+	map_iter<Key, T, IsConst, Compare, Alloc>	base(void) const;
 	reference		operator*(void) const;
 	map_rev_iter &	operator++(void);
 	map_rev_iter 	operator++(int);
@@ -155,10 +155,11 @@ map_rev_iter<Key, T, IsConst, Compare, Alloc> &
 
 template< typename Key, typename T, bool IsConst, typename Compare,
 	typename Alloc >
-map_rev_iter<Key, T, IsConst, Compare, Alloc>
+map_iter<Key, T, IsConst, Compare, Alloc>
 	map_rev_iter<Key, T, IsConst, Compare, Alloc>::base(void) const
 {
-	return (*this);
+	return (map_iter<Key, T, IsConst, Compare, Alloc>(this->_node,
+		this->_prev));
 }
 
 template< typename Key, typename T, bool IsConst, typename Compare,
