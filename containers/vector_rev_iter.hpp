@@ -241,42 +241,84 @@ bool
 // NON-MEMBER functions
 
 template < typename T, bool IsConst >
-bool	operator!=(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator!=(vector_rev_iter<T, false> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() != rhs.base());
 }
 
 template < typename T, bool IsConst >
-bool	operator==(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator!=(vector_rev_iter<T, true> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() != rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator==(vector_rev_iter<T, false> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() == rhs.base());
 }
 
 template < typename T, bool IsConst >
-bool	operator<(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator==(vector_rev_iter<T, true> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() == rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator<(vector_rev_iter<T, false> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() > rhs.base());
 }
 
 template < typename T, bool IsConst >
-bool	operator<=(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator<(vector_rev_iter<T, true> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() > rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator<=(vector_rev_iter<T, false> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() >= rhs.base());
 }
 
 template < typename T, bool IsConst >
-bool	operator>(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator<=(vector_rev_iter<T, true> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() >= rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator>(vector_rev_iter<T, false> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() < rhs.base());
 }
 
 template < typename T, bool IsConst >
-bool	operator>=(vector_rev_iter<T, IsConst> const & lhs,
+bool	operator>(vector_rev_iter<T, true> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() < rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator>=(vector_rev_iter<T, false> const & lhs,
+	vector_rev_iter<T, IsConst> const & rhs)
+{
+	return (lhs.base() <= rhs.base());
+}
+
+template < typename T, bool IsConst >
+bool	operator>=(vector_rev_iter<T, true> const & lhs,
 	vector_rev_iter<T, IsConst> const & rhs)
 {
 	return (lhs.base() <= rhs.base());
@@ -292,7 +334,15 @@ vector_rev_iter<T, IsConst>
 
 template < typename T, bool IsConst >
 typename vector_rev_iter<T, IsConst>::difference_type
-	operator-(const vector_rev_iter<T, IsConst>& lhs,
+	operator-(const vector_rev_iter<T, false>& lhs,
+	const vector_rev_iter<T, IsConst>& rhs)
+{
+	return (rhs.base() - lhs.base());
+}
+
+template < typename T, bool IsConst >
+typename vector_rev_iter<T, IsConst>::difference_type
+	operator-(const vector_rev_iter<T, true>& lhs,
 	const vector_rev_iter<T, IsConst>& rhs)
 {
 	return (rhs.base() - lhs.base());
