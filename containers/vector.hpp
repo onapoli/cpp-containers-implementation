@@ -206,15 +206,22 @@ namespace	ft
 		allocator_type const & alloc,
 		typename
 		ft::enable_if< ft::is_integral<InputIterator>::value == false >::type *)
-		: _alloc(alloc), _content(0), _size(last - first), _capacity(_size)
+		: _alloc(alloc), _content(0), _size(0), _capacity(0)
 	{
-		size_type	i;
+		InputIterator	it;
+		size_type		i;
 
-		//std::cout << "vector range Constructor called" << std::endl;
-		this->_content = this->_alloc.allocate(this->_capacity);
-		for (i = 0; first + i != last; ++i)
+		it = first;
+		for (it = first; it != last; ++it)
 		{
-			this->_alloc.construct(this->_content + i, *(first + i));
+			++this->_size;
+		}		
+		//std::cout << "vector range Constructor called" << std::endl;
+		this->_capacity = this->_size;
+		this->_content = this->_alloc.allocate(this->_capacity);
+		for (i = 0; first != last; ++i, ++first)
+		{
+			this->_alloc.construct(this->_content + i, *(first));
 		}
 		return ;
 	}
@@ -514,16 +521,21 @@ namespace	ft
 				typename ft::enable_if< ft::is_integral<InputIterator>::value
 				== false >::type *)
 	{
-		size_type	i;
+		InputIterator	it;
+		size_type		i;
 
 		//std::cout << "ASSIGN RANGED CALLED" << std::endl;
 		this->_free_content();
-		this->_size = last - first;
+		this->_size = 0;
+		for (it = first; it != last; ++it)
+		{
+			++this->_size;
+		}
 		this->_capacity = this->_size;
 		this->_content = this->_alloc.allocate(this->_capacity);
-		for (i = 0; first + i != last; ++i)
+		for (i = 0; first != last; ++first, ++i)
 		{
-			this->_alloc.construct(this->_content + i, *(first + i));
+			this->_alloc.construct(this->_content + i, *(first));
 		}
 		return ;
 	}
@@ -621,7 +633,11 @@ namespace	ft
 		size_type	new_capacity;
 
 		pos_index = position - this->begin();
-		n = last - first;
+		n = 0;
+		for (InputIterator it = first; it != last; ++it)
+		{
+			++n;
+		}
 		if (this->_size + n > this->_capacity)
 		{
 			new_capacity = this->_capacity * 2 >= this->_size + n
@@ -848,7 +864,11 @@ namespace	ft
 		size_type		j;
 		InputIterator	it;
 
-		new_capacity = this->_capacity + (last - first);
+		new_capacity = this->_capacity;
+		for (it = first; it != last; ++it)
+		{
+			++new_capacity;
+		}
 		for (i = 0; i < needle; ++i)
 		{
 			this->_alloc.construct(aux + i, this->_content[i]);
@@ -861,10 +881,6 @@ namespace	ft
 		{
 			this->_alloc.construct(aux + i, this->_content[j]);
 		}
-		/*for (; i < new_capacity; ++i)
-		{
-			this->_alloc.construct(aux + i, *first);
-		}*/
 		return ;
 	}
 
