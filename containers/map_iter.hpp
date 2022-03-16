@@ -259,32 +259,29 @@ map_iter<Key, T, IsConst, Compare, Alloc> &
 		return (*this);
 	}
 	this->_prev = this->_node;
-	if (this->_node)
+	if (this->_node->getLeft())
 	{
-		if (this->_node->getLeft())
+		this->_node = this->_node->getLeft();
+		while (this->_node->getRight())
+			this->_node = this->_node->getRight();
+	}
+	else
+	{
+		while (1)
 		{
-			this->_node = this->_node->getLeft();
-			while (this->_node->getRight())
-				this->_node = this->_node->getRight();
-		}
-		else
-		{
-			while (1)
+			if (this->_node->getParent())
 			{
-				if (this->_node->getParent())
+				if (this->_node == this->_node->getParent()->getRight())
 				{
-					if (this->_node == this->_node->getParent()->getRight())
-					{
-						this->_node = this->_node->getParent();
-						break ;
-					}
 					this->_node = this->_node->getParent();
-				}
-				else
-				{
-					this->_node = 0;
 					break ;
 				}
+				this->_node = this->_node->getParent();
+			}
+			else
+			{
+				this->_node = 0;
+				break ;
 			}
 		}
 	}
