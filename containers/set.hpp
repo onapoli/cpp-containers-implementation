@@ -111,8 +111,6 @@ namespace	ft
 		allocator_type	_alloc;
 		key_compare		_comp;
 		tree_node *		_root;
-		//EMPTY NODE FOR begin, end, rbegin, rend WHEN _size = 0
-		tree_node *		_aux;
 		size_type		_size;
 
 		value_type *				_persist_val(value_type const & val);
@@ -147,9 +145,8 @@ namespace	ft
 	template< typename T, typename Compare, typename Alloc >
 	set<T, Compare, Alloc>::set(key_compare const & comp,
 		allocator_type const & alloc) : _alloc(alloc), _comp(comp), _root(0),
-		_aux(0), _size(0)
+		_size(0)
 	{
-		this->_aux = new tree_node(false, 0, new value_type());
 		return ;
 	}
 
@@ -158,8 +155,7 @@ namespace	ft
 	set<T, Compare, Alloc>::set(InputIterator first, InputIterator last,
        	key_compare const & comp, allocator_type const & alloc,
 		typename ft::enable_if< ft::is_integral<InputIterator>::value
-		== false >::type *) : _alloc(alloc), _comp(comp), _root(0), _aux(0),
-		_size(0)
+		== false >::type *) : _alloc(alloc), _comp(comp), _root(0), _size(0)
 	{
 		InputIterator	it;
 
@@ -167,14 +163,12 @@ namespace	ft
 		{
 			this->insert(*it);
 		}
-		this->_aux = new tree_node(false, 0, new value_type());
 		return ;
 	}
 
 	template< typename T, typename Compare, typename Alloc >
 	set<T, Compare, Alloc>::set(set const & src)
-		: _alloc(allocator_type()), _comp(key_compare()), _root(0), _aux(0),
-		_size(0)
+		: _alloc(allocator_type()), _comp(key_compare()), _root(0), _size(0)
 	{
 		*this = src;
 		return ;
@@ -184,8 +178,6 @@ namespace	ft
 	set<T, Compare, Alloc>::~set(void)
 	{
 		this->_delete_tree(this->_root);
-		delete (&(this->_aux->getValue()));
-		delete this->_aux;
 		return ;
 	}
 
@@ -202,8 +194,6 @@ namespace	ft
 			//DEEP COPY
 			if (rhs._size)
 				this->_root = this->_copy_tree(rhs._root);
-			if (!this->_aux)
-				this->_aux = new tree_node(false, 0, new value_type());
 			this->_size = rhs._size;
 		}
 		return (*this);
@@ -218,7 +208,7 @@ namespace	ft
 		tree_node *	node;
 
 		if (!this->_size)
-			return (iterator(this->_aux));
+			return (iterator(this->_root));
 		node = this->_root;
 		while (node->getLeft())
 			node = node->getLeft();
@@ -232,7 +222,7 @@ namespace	ft
 		tree_node *	node;
 
 		if (!this->_size)
-			return (const_iterator(this->_aux));
+			return (const_iterator(this->_root));
 		node = this->_root;
 		while (node->getLeft())
 			node = node->getLeft();
@@ -244,13 +234,14 @@ namespace	ft
 		set<T, Compare, Alloc>::end(void)
 	{
 		tree_node *	node;
-		iterator			it;
+		iterator	it;
 
-		if (!this->_size)
-			return (iterator(this->_aux));
 		node = this->_root;
-		while (node->getRight())
-			node = node->getRight();
+		if (node)
+		{
+			while (node->getRight())
+				node = node->getRight();
+		}
 		it = iterator(node);
 		++it;
 		return (it);
@@ -260,14 +251,15 @@ namespace	ft
 	typename set<T, Compare, Alloc>::const_iterator
 		set<T, Compare, Alloc>::end(void) const
 	{
-		tree_node *	node;
-		const_iterator			it;
+		tree_node *		node;
+		const_iterator	it;
 
-		if (!this->_size)
-			return (const_iterator(this->_aux));
 		node = this->_root;
-		while (node->getRight())
-			node = node->getRight();
+		if (node)
+		{
+			while (node->getRight())
+				node = node->getRight();
+		}
 		it = const_iterator(node);
 		++it;
 		return (it);
@@ -281,14 +273,16 @@ namespace	ft
 		iterator	it;
 
 		if (!this->_size)
-			return (reverse_iterator(this->_aux));
+			return (reverse_iterator(this->_root));
 		node = this->_root;
-		while (node->getRight())
-			node = node->getRight();
+		if (node)
+		{
+			while (node->getRight())
+				node = node->getRight();
+		}
 		it = iterator(node);
 		++it;
-		return (reverse_iterator(it._node, it._end_offset,
-			it._begin_offset));
+		return (reverse_iterator(it._node, it._prev));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -299,14 +293,16 @@ namespace	ft
 		iterator	it;
 
 		if (!this->_size)
-			return (const_reverse_iterator(this->_aux));
+			return (const_reverse_iterator(this->_root));
 		node = this->_root;
-		while (node->getRight())
-			node = node->getRight();
+		if (node)
+		{
+			while (node->getRight())
+				node = node->getRight();
+		}
 		it = iterator(node);
 		++it;
-		return (const_reverse_iterator(it._node, it._end_offset,
-			it._begin_offset));
+		return (const_reverse_iterator(it._node, it._prev));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -317,13 +313,12 @@ namespace	ft
 		iterator	it;
 
 		if (!this->_size)
-			return (reverse_iterator(this->_aux));
+			return (reverse_iterator(this->_root));
 		node = this->_root;
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (reverse_iterator(it._node, it._end_offset,
-			it._begin_offset));
+		return (reverse_iterator(it._node, it._prev));
 	}
 
 	template< typename T, typename Compare, typename Alloc >
@@ -334,13 +329,12 @@ namespace	ft
 		iterator	it;
 
 		if (!this->_size)
-			return (const_reverse_iterator(this->_aux));
+			return (const_reverse_iterator(this->_root));
 		node = this->_root;
 		while (node->getLeft())
 			node = node->getLeft();
 		it = iterator(node);
-		return (const_reverse_iterator(it._node, it._end_offset,
-			it._begin_offset));
+		return (const_reverse_iterator(it._node, it._prev));
 	}
 
 	//Capacity
@@ -400,7 +394,9 @@ namespace	ft
 			this->_size += 1;
 			return (iterator(this->_root));
 		}
-		if (this->_comp(*position, val)
+		if (!position._node)
+			pr = this->_insert_node(this->_root, val);
+		else if (this->_comp(*position, val)
 			&& (!position._node->getParent()
 				|| this->_comp(position._node->getParent()->getValue(),
 					*position)))
@@ -423,18 +419,12 @@ namespace	ft
 				InputIterator last)
 	{
 		InputIterator	it;
-		iterator		hint;
 	
 		it = first;
-		if (it != last)
+		while (it != last)
 		{
-			hint = (this->insert(*it)).first;
+			this->insert(*it);
 			++it;
-			while (it != last)
-			{
-				hint = this->insert(hint, *it);
-				++it;
-			}
 		}
 		return ;
 	}

@@ -56,8 +56,10 @@ public:
 	*/
 	vector_iter<T, IsConst> &	operator=(vector_iter<T, false> const & rhs);
 
-	bool						operator!=(vector_iter<T, IsConst> const & rhs) const;
-	bool						operator==(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator!=(vector_iter<T, false> const & rhs) const;
+	bool						operator!=(vector_iter<T, true> const & rhs) const;
+	bool						operator==(vector_iter<T, false> const & rhs) const;
+	bool						operator==(vector_iter<T, true> const & rhs) const;
 	reference					operator*(void) const;
 	pointer						operator->(void) const;
 	vector_iter<T, IsConst> &	operator++(void);
@@ -68,10 +70,14 @@ public:
 	difference_type				operator+(vector_iter<T, IsConst> const & rhs) const;
 	vector_iter<T, IsConst>		operator-(difference_type offset) const;
 	difference_type				operator-(vector_iter<T, IsConst> const & rhs) const;
-	bool						operator<(vector_iter<T, IsConst> const & rhs) const;
-	bool						operator>(vector_iter<T, IsConst> const & rhs) const;
-	bool						operator<=(vector_iter<T, IsConst> const & rhs) const;
-	bool						operator>=(vector_iter<T, IsConst> const & rhs) const;
+	bool						operator<(vector_iter<T, false> const & rhs) const;
+	bool						operator<(vector_iter<T, true> const & rhs) const;
+	bool						operator>(vector_iter<T, false> const & rhs) const;
+	bool						operator>(vector_iter<T, true> const & rhs) const;
+	bool						operator<=(vector_iter<T, false> const & rhs) const;
+	bool						operator<=(vector_iter<T, true> const & rhs) const;
+	bool						operator>=(vector_iter<T, false> const & rhs) const;
+	bool						operator>=(vector_iter<T, true> const & rhs) const;
 	vector_iter<T, IsConst> &	operator+=(difference_type offset);
 	vector_iter<T, IsConst> &	operator-=(difference_type offset);
 	reference					operator[](difference_type offset) const;
@@ -80,6 +86,7 @@ private:
 
 	//In order to access private members of const from non const.
 	friend class	vector_iter<T, true>;
+	friend class	vector_iter<T, false>;
 
 	/*
 	**	vector_rev_iter FRIENDSHIP IS NEEDED TO ELUDE THE CREATION
@@ -137,13 +144,25 @@ vector_iter<T, IsConst> &
 }
 
 template< typename T, bool IsConst >
-bool	vector_iter<T, IsConst>::operator!=(vector_iter<T, IsConst> const & rhs) const
+bool	vector_iter<T, IsConst>::operator!=(vector_iter<T, false> const & rhs) const
 {
 	return (this->_v != rhs._v);
 }
 
 template< typename T, bool IsConst >
-bool	vector_iter<T, IsConst>::operator==(vector_iter<T, IsConst> const & rhs) const
+bool	vector_iter<T, IsConst>::operator!=(vector_iter<T, true> const & rhs) const
+{
+	return (this->_v != rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool	vector_iter<T, IsConst>::operator==(vector_iter<T, false> const & rhs) const
+{
+	return (this->_v == rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool	vector_iter<T, IsConst>::operator==(vector_iter<T, true> const & rhs) const
 {
 	return (this->_v == rhs._v);
 }
@@ -233,28 +252,56 @@ typename vector_iter<T, IsConst>::difference_type
 
 template< typename T, bool IsConst >
 bool
-	vector_iter<T, IsConst>::operator<(vector_iter<T, IsConst> const & rhs) const
+	vector_iter<T, IsConst>::operator<(vector_iter<T, false> const & rhs) const
 {
 	return (this->_v < rhs._v);
 }
 
 template< typename T, bool IsConst >
 bool
-	vector_iter<T, IsConst>::operator>(vector_iter<T, IsConst> const & rhs) const
+	vector_iter<T, IsConst>::operator<(vector_iter<T, true> const & rhs) const
+{
+	return (this->_v < rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator>(vector_iter<T, false> const & rhs) const
 {
 	return (this->_v > rhs._v);
 }
 
 template< typename T, bool IsConst >
 bool
-	vector_iter<T, IsConst>::operator<=(vector_iter<T, IsConst> const & rhs) const
+	vector_iter<T, IsConst>::operator>(vector_iter<T, true> const & rhs) const
+{
+	return (this->_v > rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator<=(vector_iter<T, false> const & rhs) const
 {
 	return (this->_v <= rhs._v);
 }
 
 template< typename T, bool IsConst >
 bool
-	vector_iter<T, IsConst>::operator>=(vector_iter<T, IsConst> const & rhs) const
+	vector_iter<T, IsConst>::operator<=(vector_iter<T, true> const & rhs) const
+{
+	return (this->_v <= rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator>=(vector_iter<T, false> const & rhs) const
+{
+	return (this->_v >= rhs._v);
+}
+
+template< typename T, bool IsConst >
+bool
+	vector_iter<T, IsConst>::operator>=(vector_iter<T, true> const & rhs) const
 {
 	return (this->_v >= rhs._v);
 }
@@ -282,12 +329,54 @@ typename vector_iter<T, IsConst>::reference
 	return (*(this->_v + offset));
 }
 
+//Non-Member functions
+
 template< typename T, bool IsConst >
 vector_iter<T, IsConst>
 	operator+(typename vector_iter<T, IsConst>::difference_type offset,
 		vector_iter<T, IsConst> const & rhs)
 {
 	return (rhs + offset);
+}
+
+template< typename T, bool IsConst >
+bool
+	operator==(typename vector_iter<T, IsConst>::pointer p,
+		vector_iter<T, IsConst> const & rhs)
+{
+	vector_iter<T, IsConst>	lhs(p);
+
+	return (lhs == rhs);
+}
+
+template< typename T, bool IsConst >
+bool
+	operator==(vector_iter<T, IsConst> const & lhs,
+		typename vector_iter<T, IsConst>::pointer p)
+{
+	vector_iter<T, IsConst>	rhs(p);
+
+	return (lhs == rhs);
+}
+
+template< typename T, bool IsConst >
+bool
+	operator!=(typename vector_iter<T, IsConst>::pointer p,
+		vector_iter<T, IsConst> const & rhs)
+{
+	vector_iter<T, IsConst>	lhs(p);
+
+	return (lhs != rhs);
+}
+
+template< typename T, bool IsConst >
+bool
+	operator!=(vector_iter<T, IsConst> const & lhs,
+		typename vector_iter<T, IsConst>::pointer p)
+{
+	vector_iter<T, IsConst>	rhs(p);
+
+	return (lhs != rhs);
 }
 
 #endif

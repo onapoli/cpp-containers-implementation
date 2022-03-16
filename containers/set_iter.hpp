@@ -47,8 +47,7 @@ public:
 
 	set_iter(void);
 
-	explicit set_iter(node * n, size_type end_offset = 0,
-		size_type begin_offset = 0);
+	explicit set_iter(node * n, node * prev = 0);
 	
 	set_iter(set_iter const & src);
 	~set_iter(void);
@@ -80,8 +79,7 @@ private:
 
 	key_compare	_comp;
 	node *		_node;
-	size_type	_end_offset;
-	size_type	_begin_offset;
+	node *		_prev;
 };
 
 
@@ -90,23 +88,21 @@ private:
 
 template< typename T, typename Compare, typename Alloc >
 set_iter<T, Compare, Alloc>::set_iter(void)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	return ;
 }
 
 template< typename T, typename Compare, typename Alloc >
-set_iter<T, Compare, Alloc>::set_iter(node * n,
-	size_type end_offset, size_type begin_offset)
-	: _comp(key_compare()), _node(n), _end_offset(end_offset),
-	_begin_offset(begin_offset)
+set_iter<T, Compare, Alloc>::set_iter(node * n, node * prev)
+	: _comp(key_compare()), _node(n), _prev(prev)
 {
 	return ;
 }
 
 template< typename T, typename Compare, typename Alloc >
 set_iter<T, Compare, Alloc>::set_iter(set_iter<T, Compare, Alloc> const & src)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	*this = src;
 	return ;
@@ -128,8 +124,7 @@ set_iter<T, Compare, Alloc> &
 	*/
 	this->_comp = rhs._comp;
 	this->_node = rhs._node;
-	this->_end_offset = rhs._end_offset;
-	this->_begin_offset = rhs._begin_offset;
+	this->_prev = rhs._prev;
 	return (*this);
 }
 
@@ -137,9 +132,7 @@ template< typename T, typename Compare, typename Alloc >
 bool
 	set_iter<T, Compare, Alloc>::operator!=(set_iter const & rhs) const
 {
-	return (this->_node != rhs._node
-		|| this->_begin_offset != rhs._begin_offset
-		|| this->_end_offset != rhs._end_offset);
+	return (this->_node != rhs._node);
 }
 
 template< typename T, typename Compare, typename Alloc >
@@ -167,47 +160,34 @@ template< typename T, typename Compare, typename Alloc >
 set_iter<T, Compare, Alloc> &
 	set_iter<T, Compare, Alloc>::operator++(void)
 {
-	node *	prev;
-
-	prev = this->_node;
-	if (this->_begin_offset)
-		--this->_begin_offset;
-	else if (this->_end_offset)
-		++this->_end_offset;
+	if (!this->_node)
+		return (*this);
+	this->_prev = this->_node;
+	if (this->_node->getRight())
+	{
+		this->_node = this->_node->getRight();
+		while (this->_node->getLeft())
+			this->_node = this->_node->getLeft();
+	}
 	else
 	{
-		if (this->_node)
+		while (1)
 		{
-			if (this->_node->getRight())
+			if (this->_node->getParent())
 			{
-				this->_node = this->_node->getRight();
-				while (this->_node->getLeft())
-					this->_node = this->_node->getLeft();
+				if (this->_node == this->_node->getParent()->getLeft())
+				{
+					this->_node = this->_node->getParent();
+					break ;
+				}
+				this->_node = this->_node->getParent();
 			}
 			else
 			{
-				while (1)
-				{
-					if (this->_node->getParent())
-					{
-						if (this->_node == this->_node->getParent()->getLeft())
-						{
-							this->_node = this->_node->getParent();
-							break ;
-						}
-						this->_node = this->_node->getParent();
-					}
-					else
-					{
-						this->_node = prev;
-						++this->_end_offset;
-						break ;
-					}
-				}
-			}				
+				this->_node = 0;
+				break ;
+			}
 		}
-		else
-			++this->_end_offset;
 	}
 	return (*this);
 }
@@ -226,47 +206,37 @@ template< typename T, typename Compare, typename Alloc >
 set_iter<T, Compare, Alloc> &
 	set_iter<T, Compare, Alloc>::operator--(void)
 {
-	node *	prev;
-
-	prev = this->_node;
-	if (this->_end_offset)
-		--this->_end_offset;
-	else if (this->_begin_offset)
-		++this->_begin_offset;
+	if (!this->_node)
+	{
+		this->_node = this->_prev;
+		return (*this);
+	}
+	this->_prev = this->_node;
+	if (this->_node->getLeft())
+	{
+		this->_node = this->_node->getLeft();
+		while (this->_node->getRight())
+			this->_node = this->_node->getRight();
+	}
 	else
 	{
-		if (this->_node)
+		while (1)
 		{
-			if (this->_node->getLeft())
+			if (this->_node->getParent())
 			{
-				this->_node = this->_node->getLeft();
-				while (this->_node->getRight())
-					this->_node = this->_node->getRight();
+				if (this->_node == this->_node->getParent()->getRight())
+				{
+					this->_node = this->_node->getParent();
+					break ;
+				}
+				this->_node = this->_node->getParent();
 			}
 			else
 			{
-				while (1)
-				{
-					if (this->_node->getParent())
-					{
-						if (this->_node == this->_node->getParent()->getRight())
-						{
-							this->_node = this->_node->getParent();
-							break ;
-						}
-						this->_node = this->_node->getParent();
-					}
-					else
-					{
-						this->_node = prev;
-						++this->_end_offset;
-						break ;
-					}
-				}
+				this->_node = 0;
+				break ;
 			}
 		}
-		else
-			++this->_begin_offset;
 	}
 	return (*this);
 }
