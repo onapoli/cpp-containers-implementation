@@ -473,7 +473,6 @@ namespace	ft
 				InputIterator last)
 	{
 		InputIterator	it;
-		iterator		hint;
 	
 		it = first;
 		while (it != last)
