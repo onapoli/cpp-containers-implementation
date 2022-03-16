@@ -4,6 +4,7 @@
 # include <memory>
 # include <functional>
 # include <cstddef>
+# include <limits>
 
 #include <iostream> // FOR TESTING
 
@@ -364,7 +365,8 @@ namespace	ft
 	typename set<T, Compare, Alloc>::size_type
 		set<T, Compare, Alloc>::max_size(void) const
 	{
-		return (this->_alloc.max_size());
+		return (std::numeric_limits<size_type>::max() / (sizeof(value_type)
+			+ sizeof(tree_node)));
 	}
 
 	//Modifiers
