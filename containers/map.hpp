@@ -4,6 +4,7 @@
 # include <memory>
 # include <functional>
 # include <cstddef>
+# include <limits>
 
 # include "../utility/utility.hpp"
 # include "../type_traits/type_traits.hpp"
@@ -392,7 +393,8 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::size_type
 		map<Key, T, Compare, Alloc>::max_size(void) const
 	{
-		return (this->_alloc.max_size());
+		return (std::numeric_limits<size_type>::max() / (sizeof(value_type)
+			+ sizeof(tree_node)));
 	}
 
 	//Element Access
