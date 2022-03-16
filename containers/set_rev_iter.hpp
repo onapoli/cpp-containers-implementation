@@ -44,15 +44,14 @@ public:
 	typedef TreeNode< value_type >						node;
 
 	set_rev_iter(void);
-	explicit set_rev_iter(node * n, size_type end_offset = 0,
-		size_type begin_offset = 0);
+	explicit set_rev_iter(node * n, node * prev = 0);
 
 	set_rev_iter(set_rev_iter const & src);	
 	explicit set_rev_iter(set_iter<T, Compare, Alloc> const & src);
 
 	set_rev_iter &	operator=(set_rev_iter const & rhs);
 
-	set_rev_iter	base(void) const;
+	set_iter<T, Compare, Alloc>	base(void) const;
 	const_reference	operator*(void) const;
 	const_pointer	operator->(void) const;
 	set_rev_iter &	operator++(void);
@@ -66,30 +65,27 @@ private:
 
 	key_compare	_comp;
 	node *		_node;
-	size_type	_end_offset;
-	size_type	_begin_offset;
+	node *		_prev;
 
 };
 
 template< typename T, typename Compare, typename Alloc >
 set_rev_iter<T, Compare, Alloc>::set_rev_iter(void)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	return ;
 }
 
 template< typename T, typename Compare, typename Alloc >
-set_rev_iter<T, Compare, Alloc>::set_rev_iter(node * n,
-	size_type end_offset, size_type begin_offset)
-	: _comp(key_compare()), _node(n), _end_offset(end_offset),
-	_begin_offset(begin_offset)
+set_rev_iter<T, Compare, Alloc>::set_rev_iter(node * n, node * prev)
+	: _comp(key_compare()), _node(n), _prev(prev)
 {
 	return ;
 }
 
 template< typename T, typename Compare, typename Alloc >
 set_rev_iter<T, Compare, Alloc>::set_rev_iter(set_rev_iter const & src)
-	: _comp(key_compare()), _node(0), _end_offset(0), _begin_offset(0)
+	: _comp(key_compare()), _node(0), _prev(0)
 {
 	*this = src;
 	return ;
@@ -98,8 +94,7 @@ set_rev_iter<T, Compare, Alloc>::set_rev_iter(set_rev_iter const & src)
 template< typename T, typename Compare, typename Alloc >
 set_rev_iter<T, Compare, Alloc>::set_rev_iter(
 	set_iter<T, Compare, Alloc> const & src) : _comp(key_compare()),
-		_node(src._node), _end_offset(src._end_offset),
-		_begin_offset(src._begin_offset)
+		_node(src._node), _prev(src._prev)
 {
 	return ;
 }
@@ -114,16 +109,15 @@ set_rev_iter<T, Compare, Alloc> &
 	*/
 	this->_comp = rhs._comp;
 	this->_node = rhs._node;
-	this->_end_offset = rhs._end_offset;
-	this->_begin_offset = rhs._begin_offset;
+	this->_prev = rhs._prev;
 	return (*this);
 }
 
 template< typename T, typename Compare, typename Alloc >
-set_rev_iter<T, Compare, Alloc>
+set_iter<T, Compare, Alloc>
 	set_rev_iter<T, Compare, Alloc>::base(void) const
 {
-	return (*this);
+	return (set_iter<T, Compare, Alloc>(this->_node, this->_prev));
 }
 
 template< typename T, typename Compare, typename Alloc >
@@ -131,7 +125,7 @@ typename set_rev_iter<T, Compare, Alloc>::const_reference
 	set_rev_iter<T, Compare, Alloc>::operator*(void) const
 {
 	//THIS IS THE set_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	return (*(--it));
 }
@@ -148,12 +142,11 @@ set_rev_iter<T, Compare, Alloc> &
 	set_rev_iter<T, Compare, Alloc>::operator++(void)
 {
 	//THIS IS THE set_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	--it;
 	this->_node = it._node;
-	this->_end_offset = it._end_offset;
-	this->_begin_offset = it._begin_offset;
+	this->_prev = it._prev;
 	return (*this);
 }
 
@@ -172,12 +165,11 @@ set_rev_iter<T, Compare, Alloc> &
 	set_rev_iter<T, Compare, Alloc>::operator--(void)
 {
 	//THIS IS THE set_iter CLASS iterator, TO AVOID CODE DUPLICATION
-	iter	it(this->_node, this->_end_offset, this->_begin_offset);
+	iter	it(this->_node, this->_prev);
 
 	++it;
 	this->_node = it._node;
-	this->_end_offset = it._end_offset;
-	this->_begin_offset = it._begin_offset;
+	this->_prev = it._prev;
 	return (*this);
 }
 
@@ -195,9 +187,7 @@ template< typename T, typename Compare, typename Alloc >
 bool
 	set_rev_iter<T, Compare, Alloc>::operator!=(set_rev_iter const & rhs) const
 {
-	return (this->_node != rhs._node
-		|| this->_begin_offset != rhs._begin_offset
-		|| this->_end_offset != rhs._end_offset);
+	return (this->_node != rhs._node);
 }
 
 template< typename T, typename Compare, typename Alloc >
