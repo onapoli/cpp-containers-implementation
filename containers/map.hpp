@@ -4,7 +4,6 @@
 # include <memory>
 # include <functional>
 # include <cstddef>
-# include <limits>
 
 #include <iostream> // FOR TESTING
 
@@ -65,18 +64,26 @@ namespace	ft
 		};
 
 		typedef	Alloc										allocator_type;
-		typedef	typename allocator_type::reference			reference;
-		typedef typename allocator_type::const_reference	const_reference;
-		typedef	typename allocator_type::pointer			pointer;
-		typedef	typename allocator_type::const_pointer		const_pointer;
+
+		typedef TreeNode< value_type >						tree_node;
+		/*
+		**	THIS GENERATES A NEW allocator from Alloc TO ALLOCATE MEMORY
+		**	FOR THE CONTENT OF tree_node, WHICH CONTAINS value_type,
+		**	INSTEAD OF ONLY ALLOCATING MEMORY FOR value_type.
+		*/
+		typedef typename Alloc::template rebind<tree_node>::other
+															node_allocator;
+
+		typedef	typename node_allocator::reference			reference;
+		typedef typename node_allocator::const_reference	const_reference;
+		typedef	typename node_allocator::pointer			pointer;
+		typedef	typename node_allocator::const_pointer		const_pointer;
 		typedef	map_iter<Key, T, false, Compare, Alloc>		iterator;
 		typedef	map_iter<Key, T, true, Compare, Alloc>		const_iterator;
 		typedef map_rev_iter<Key, T, false, Compare, Alloc>	reverse_iterator;
 		typedef map_rev_iter<Key, T, true, Compare, Alloc>	const_reverse_iterator;
 		typedef	std::ptrdiff_t								difference_type;
 		typedef	std::size_t									size_type;
-
-		typedef TreeNode< value_type >						tree_node;
 
 		//Member functions
 		explicit map(key_compare const & comp = key_compare(),
@@ -150,43 +157,43 @@ namespace	ft
 
 		typedef struct	_s_node_fam
 		{
-			tree_node *	parent;
-			tree_node *	sibling;
-			tree_node *	gParent;
-			tree_node *	uncle;
+			pointer	parent;
+			pointer	sibling;
+			pointer	gParent;
+			pointer	uncle;
 		}				_t_node_fam;
 		
 		allocator_type	_alloc;
+		node_allocator	_nAlloc;
 		key_compare		_comp;
-		tree_node *		_root;
+		pointer			_root;
 		size_type		_size;
 
-		value_type *				_persist_val(value_type const & val);
 		//Rebalancing functions
-		void						_init_fam(tree_node * node,
+		void						_init_fam(pointer node,
 										_t_node_fam & fam);
-		void						_left_rotate(tree_node * node);
-		void						_right_rotate(tree_node * node);
+		void						_left_rotate(pointer node);
+		void						_right_rotate(pointer node);
 		//rebalancing cases
-		void						_left_left(tree_node * target);
-		void						_left_right(tree_node * target);
-		void						_right_right(tree_node * target);
-		void						_right_left(tree_node * target);
+		void						_left_left(pointer target);
+		void						_left_right(pointer target);
+		void						_right_right(pointer target);
+		void						_right_left(pointer target);
 		//insertion and insertion rebalancing functions
-		void						_balance_insert(tree_node * target);
-		ft::pair<iterator, bool>	_insert_node(tree_node * node,
+		void						_balance_insert(pointer target);
+		ft::pair<iterator, bool>	_insert_node(pointer node,
 										value_type const & val);
 		//erase and erase rebalancing functions
-		void						_balance_erase(tree_node * node);
-		tree_node *					_get_substitute(tree_node * node);
-		void						_delete_node(tree_node * node);
+		void						_balance_erase(pointer node);
+		pointer						_get_substitute(pointer node);
+		void						_delete_node(pointer node);
 		//function for deleting the entire tree
-		void						_delete_tree(tree_node * node);
-		tree_node *					_copy_tree(tree_node * node);
+		void						_delete_tree(pointer node);
+		pointer						_copy_tree(pointer node);
 		//utility function
-		tree_node *					_search(key_type const & k) const;
+		pointer						_search(key_type const & k) const;
 		//test function
-		void						_printTree(tree_node * node,
+		void						_printTree(pointer node,
 										int space) const;
 	
 	};
@@ -195,8 +202,8 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	map<Key, T, Compare, Alloc>::map(key_compare const & comp,
-		allocator_type const & alloc) : _alloc(alloc), _comp(comp), _root(0),
-		_size(0)
+		allocator_type const & alloc) : _alloc(alloc),
+		_nAlloc(node_allocator()), _comp(comp), _root(0), _size(0)
 	{
 		return ;
 	}
@@ -206,7 +213,8 @@ namespace	ft
 	map<Key, T, Compare, Alloc>::map(InputIterator first, InputIterator last,
        	key_compare const & comp, allocator_type const & alloc,
 		typename ft::enable_if< ft::is_integral<InputIterator>::value
-		== false >::type *) : _alloc(alloc), _comp(comp), _root(0), _size(0)
+		== false >::type *) : _alloc(alloc), _nAlloc(node_allocator()),
+		_comp(comp), _root(0), _size(0)
 	{
 		InputIterator	it;
 
@@ -219,7 +227,8 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	map<Key, T, Compare, Alloc>::map(map const & src)
-		: _alloc(allocator_type()), _comp(key_compare()), _root(0), _size(0)
+		: _alloc(allocator_type()), _nAlloc(node_allocator()),
+		_comp(key_compare()), _root(0), _size(0)
 	{
 		*this = src;
 		return ;
@@ -241,6 +250,7 @@ namespace	ft
 			if (!this->empty())
 				this->clear();
 			this->_alloc = rhs._alloc;
+			this->_nAlloc = rhs._nAlloc;
 			this->_comp = rhs._comp;
 			//DEEP COPY
 			if (rhs._size)
@@ -256,7 +266,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::begin(void)
 	{
-		tree_node *	node;
+		pointer	node;
 
 		if (!this->_size)
 			return (iterator(this->_root));
@@ -270,7 +280,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::begin(void) const
 	{
-		tree_node *	node;
+		pointer	node;
 
 		if (!this->_size)
 			return (const_iterator(this->_root));
@@ -284,7 +294,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::end(void)
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		node = this->_root;
@@ -302,7 +312,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::end(void) const
 	{
-		tree_node *		node;
+		pointer			node;
 		const_iterator	it;
 
 		node = this->_root;
@@ -320,7 +330,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::reverse_iterator
 		map<Key, T, Compare, Alloc>::rbegin(void)
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		if (!this->_size)
@@ -337,7 +347,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
 		map<Key, T, Compare, Alloc>::rbegin(void) const
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		if (!this->_size)
@@ -354,7 +364,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::reverse_iterator
 		map<Key, T, Compare, Alloc>::rend(void)
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		if (!this->_size)
@@ -370,7 +380,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_reverse_iterator
 		map<Key, T, Compare, Alloc>::rend(void) const
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		if (!this->_size)
@@ -401,8 +411,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::size_type
 		map<Key, T, Compare, Alloc>::max_size(void) const
 	{
-		return (std::numeric_limits<size_type>::max() / (sizeof(value_type)
-			+ sizeof(tree_node)));
+		return (this->_nAlloc.max_size());
 	}
 
 	//Element Access
@@ -425,8 +434,9 @@ namespace	ft
 
 		if (!this->_root)
 		{
-			this->_root = new tree_node(false, 0,
-				this->_persist_val(val), 0, 0);
+			this->_root = this->_nAlloc.allocate(1);
+			this->_nAlloc.construct(this->_root,
+				tree_node(false, 0, val, 0, 0));
 			res = ft::make_pair<iterator, bool>(iterator(this->_root), true);
 		}
 		else
@@ -445,8 +455,9 @@ namespace	ft
 
 		if (!this->_root)
 		{
-			this->_root = new tree_node(false, 0,
-				this->_persist_val(val), 0, 0);
+			this->_root = this->_nAlloc.allocate(1);
+			this->_nAlloc.construct(this->_root,
+				tree_node(false, 0, val, 0, 0));
 			this->_size += 1;
 			return (iterator(this->_root));
 		}
@@ -499,7 +510,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::size_type
 		map<Key, T, Compare, Alloc>::erase(key_type const & k)
 	{
-		tree_node *	node;
+		pointer	node;
 
 		node = this->_search(k);
 		if (!node)
@@ -546,7 +557,7 @@ namespace	ft
 	void	map<Key, T, Compare, Alloc>::swap(map & x)
 	{
 		size_type	aux_size;
-		tree_node *	aux_root;
+		pointer		aux_root;
 
 		/*
 		**	I DECIDED TO KEEP _alloc AND _comp WHERE THEY WERE ORIGINALLY
@@ -593,7 +604,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::find(key_type const & k)
 	{
-		tree_node *	node;
+		pointer	node;
 
 		node = this->_search(k);
 		if (node)
@@ -605,7 +616,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::find(key_type const & k) const
 	{
-		tree_node *	node;
+		pointer	node;
 
 		node = this->_search(k);
 		if (node)
@@ -617,7 +628,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::size_type
 		map<Key, T, Compare, Alloc>::count(key_type const & k) const
 	{
-		tree_node *	node;
+		pointer	node;
 
 		node = this->_search(k);
 		if (node)
@@ -629,7 +640,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::iterator
 		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k)
 	{
-		tree_node *	node;
+		pointer		node;
 		iterator	it;
 
 		node = this->_root;
@@ -663,7 +674,7 @@ namespace	ft
 	typename map<Key, T, Compare, Alloc>::const_iterator
 		map<Key, T, Compare, Alloc>::lower_bound(key_type const & k) const
 	{
-		tree_node *		node;
+		pointer			node;
 		const_iterator	it;
 
 		node = this->_root;
@@ -761,18 +772,7 @@ namespace	ft
 	//Private member functions
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::value_type *
-		map<Key, T, Compare, Alloc>::_persist_val(value_type const & val)
-	{
-		value_type *	res;
-
-		res = this->_alloc.allocate(1);
-		this->_alloc.construct(res, val);
-		return (res);
-	}
-
-	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_init_fam(tree_node * node,
+	void	map<Key, T, Compare, Alloc>::_init_fam(pointer node,
 				_t_node_fam & fam)
 	{
 		fam.parent = node->getParent();
@@ -792,10 +792,10 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_left_rotate(tree_node * node)
+	void	map<Key, T, Compare, Alloc>::_left_rotate(pointer node)
 	{
-		tree_node *	parent;
-		tree_node *	right_child;
+		pointer	parent;
+		pointer	right_child;
 
 		parent = node->getParent();
 		right_child = node->getRight();
@@ -817,10 +817,10 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_right_rotate(tree_node * node)
+	void	map<Key, T, Compare, Alloc>::_right_rotate(pointer node)
 	{
-		tree_node * parent;
-		tree_node * left_child;
+		pointer parent;
+		pointer left_child;
 
 		parent = node->getParent();
 		left_child = node->getLeft();
@@ -843,7 +843,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void
-		map<Key, T, Compare, Alloc>::_left_left(tree_node * target)
+		map<Key, T, Compare, Alloc>::_left_left(pointer target)
 	{
 		/*
 		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
@@ -878,7 +878,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void
-		map<Key, T, Compare, Alloc>::_left_right(tree_node * target)
+		map<Key, T, Compare, Alloc>::_left_right(pointer target)
 	{
 		/*
 		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
@@ -915,7 +915,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void
-		map<Key, T, Compare, Alloc>::_right_right(tree_node * target)
+		map<Key, T, Compare, Alloc>::_right_right(pointer target)
 	{
 		/*
 		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
@@ -950,7 +950,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void
-		map<Key, T, Compare, Alloc>::_right_left(tree_node * target)
+		map<Key, T, Compare, Alloc>::_right_left(pointer target)
 	{
 		/*
 		**	IF THIS FUNCTION GETS CALLED, IT MEANS target HAS A GRANDPARENT,
@@ -987,7 +987,7 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	void
-		map<Key, T, Compare, Alloc>::_balance_insert(tree_node * target)
+		map<Key, T, Compare, Alloc>::_balance_insert(pointer target)
 	{
 		_t_node_fam	fam;
 
@@ -1028,22 +1028,23 @@ namespace	ft
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
 	ft::pair<typename map<Key, T, Compare, Alloc>::iterator, bool>
-		map<Key, T, Compare, Alloc>::_insert_node(tree_node * node,
+		map<Key, T, Compare, Alloc>::_insert_node(pointer node,
 			value_type const & val)
 	{
-		tree_node *	new_node;
+		pointer	new_node;
 	
 		if (this->_comp(val.first, node->getValue().first))
 		{
 			if (!node->getLeft())
 			{
-				node->setLeft(new tree_node(true, node,
-					this->_persist_val(val), 0, 0));
 				/*
 				**	new_node VARIABLE IS NECESSARY, AS node->getLeft()
 				**	MIGHT POINT TO OTHER NODE OR TO NULL AFTER ROTATIONS.
 				*/
-				new_node = node->getLeft();
+				new_node = this->_nAlloc.allocate(1);
+				this->_nAlloc.construct(new_node,
+					tree_node(true, node, val, 0, 0));
+				node->setLeft(new_node);
 				this->_balance_insert(new_node);
 				return (ft::make_pair<iterator,
 					bool>(iterator(new_node), true));
@@ -1054,13 +1055,14 @@ namespace	ft
 		{
 			if (!node->getRight())
 			{
-				node->setRight(new tree_node(true, node,
-					this->_persist_val(val), 0, 0));
 				/*
 				**	new_node VARIABLE IS NECESSARY, AS node->getRight()
 				**	MIGHT POINT TO OTHER NODE OR TO NULL AFTER ROTATIONS.
 				*/
-				new_node = node->getRight();
+				new_node = this->_nAlloc.allocate(1);
+				this->_nAlloc.construct(new_node,
+					tree_node(true, node, val, 0, 0));
+				node->setRight(new_node);
 				this->_balance_insert(new_node);
 				return (ft::make_pair<iterator,
 					bool>(iterator(new_node), true));
@@ -1071,7 +1073,7 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_balance_erase(tree_node * node)
+	void	map<Key, T, Compare, Alloc>::_balance_erase(pointer node)
 	{
 		_t_node_fam	fam;
 
@@ -1143,10 +1145,10 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::tree_node *
-		map<Key, T, Compare, Alloc>::_get_substitute(tree_node * node)
+	typename map<Key, T, Compare, Alloc>::pointer
+		map<Key, T, Compare, Alloc>::_get_substitute(pointer node)
 	{
-		tree_node *	substitute;
+		pointer	substitute;
 
 		substitute = 0;
 		/*
@@ -1168,10 +1170,10 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_delete_node(tree_node * node)
+	void	map<Key, T, Compare, Alloc>::_delete_node(pointer node)
 	{
 		_t_node_fam	node_fam;
-		tree_node *	substitute;
+		pointer		substitute;
 	
 		this->_init_fam(node, node_fam);
 		substitute = this->_get_substitute(node);
@@ -1191,9 +1193,8 @@ namespace	ft
 			}
 			else
 				this->_root = 0;
-			this->_alloc.destroy(&node->getValue());
-			this->_alloc.deallocate(&node->getValue(), 1);
-			delete node;
+			this->_nAlloc.destroy(node);
+			this->_nAlloc.deallocate(node, 1);
 			return ;
 		}
 		else if (!node->getLeft() || !node->getRight())
@@ -1218,9 +1219,8 @@ namespace	ft
 				this->_balance_erase(substitute);
 			else
 				substitute->setRed(false);
-			this->_alloc.destroy(&node->getValue());
-			this->_alloc.deallocate(&node->getValue(), 1);
-			delete node;
+			this->_nAlloc.destroy(node);
+			this->_nAlloc.deallocate(node, 1);
 			return ;
 		}
 		/*
@@ -1229,16 +1229,15 @@ namespace	ft
 		**	happens on a leaf node and not on an internal node.
 		*/
 		this->_alloc.destroy(&node->getValue());
-		this->_alloc.deallocate(&node->getValue(), 1);
-		node->setValue(this->_persist_val(substitute->getValue()));
+		this->_alloc.construct(&node->getValue(), substitute->getValue());
 		this->_delete_node(substitute);
 		return ;
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_delete_tree(tree_node * node)
+	void	map<Key, T, Compare, Alloc>::_delete_tree(pointer node)
 	{
-		tree_node *	child;
+		pointer	child;
 
 		if (!node)
 			return ;
@@ -1248,23 +1247,23 @@ namespace	ft
 		child = node->getRight();
 		if (child)
 			this->_delete_tree(child);
-		this->_alloc.destroy(&node->getValue());
-		this->_alloc.deallocate(&node->getValue(), 1);
 		if (!node->getParent())
 			this->_root = 0;
-		delete node;
+		this->_nAlloc.destroy(node);
+		this->_nAlloc.deallocate(node, 1);
 		this->_size -= 1;
 		return ;
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::tree_node *
-		map<Key, T, Compare, Alloc>::_copy_tree(tree_node * node)
+	typename map<Key, T, Compare, Alloc>::pointer
+		map<Key, T, Compare, Alloc>::_copy_tree(pointer node)
 	{
-		tree_node *	cpy;
+		pointer	cpy;
 
-		cpy = new tree_node(node->isRed(), 0,
-			this->_persist_val(node->getValue()), 0, 0);
+		cpy = this->_nAlloc.allocate(1);
+		this->_nAlloc.construct(cpy,
+			tree_node(node->isRed(), 0, node->getValue(), 0, 0));
 		if (node->getLeft())
 		{
 			cpy->setLeft(this->_copy_tree(node->getLeft()));
@@ -1279,19 +1278,17 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	typename map<Key, T, Compare, Alloc>::tree_node *
+	typename map<Key, T, Compare, Alloc>::pointer
 		map<Key, T, Compare, Alloc>::_search(key_type const & k) const
 	{
-		tree_node *		node;
-		value_type *	node_val;
+		pointer		node;
 
 		node = this->_root;
 		while (node)
 		{
-			node_val = &(node->getValue());
-			if (node_val->first == k)
+			if (node->getValue().first == k)
 				break ;
-			if (this->_comp(k, node_val->first))
+			if (this->_comp(k, node->getValue().first))
 				node = node->getLeft();
 			else
 				node = node->getRight();
@@ -1300,7 +1297,7 @@ namespace	ft
 	}
 
 	template< typename Key, typename T, typename Compare, typename Alloc >
-	void	map<Key, T, Compare, Alloc>::_printTree(tree_node * node,
+	void	map<Key, T, Compare, Alloc>::_printTree(pointer node,
 				int space) const
     {
         int	i;
