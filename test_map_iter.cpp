@@ -51,15 +51,13 @@ void	comparison(void)
 		++counter;
 	assert(counter == 3);
 	it2 = m.end();
-	//end_offset OF it IS 2 BECAUSE OF while LOOP INCREMENT it++
-	assert(it != it2);
-	--it;
 	assert(it == it2);
 	--it;
 	--it2;
 	assert(it == it2);
 	assert((*it).first == 30);
 	assert((*it2).first == 30);
+	std::cout << m.max_size() << std::endl;
 	std::cout << "\nCOMPARISON TESTS: OK\n";
 	return ;
 }

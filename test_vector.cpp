@@ -195,7 +195,7 @@ void	rev_iter(void)
 	{
 		std::cout << "value: " << *rit << " base: " << *(rit.base()) << "\n";
 		if (counter == 4)
-			assert(*rit == counter && *(rit.base()) == 0);
+			assert(*rit == counter);
 		else
 			assert(*rit == counter && *(rit.base()) == base_counter);
 		--counter;
@@ -233,7 +233,7 @@ void	rev_const(void)
 		{
 			// COMPILATION ERROR. crit IS CONST
 			// *crit = 2;
-			assert(*crit == counter && *(crit.base()) == 0);
+			assert(*crit == counter);
 		}
 		else
 			assert(*crit == counter && *(crit.base()) == base_counter);
