@@ -49,13 +49,10 @@ void	insertion(void)
 	m.insert(ft::make_pair<int, int>(20, 20));
 	m.insert(ft::make_pair<int, int>(30, 30));
 	m.insert(ft::make_pair<int, int>(40, 40));
-	m.printTree();
 	m.insert(ft::make_pair<int, int>(50, 50));
-	m.printTree();
 	m.insert(ft::make_pair<int, int>(60, 60));
 	m.insert(ft::make_pair<int, int>(70, 70));
 	m.insert(ft::make_pair<int, int>(80, 80));
-	m.printTree();
 	std::cout << "\nINSERTION TESTS: OK\n";
 	return ;
 }
